@@ -7,9 +7,14 @@ from matplotlib.lines import Line2D
 from matplotlib.colors import to_rgb
 
 # --- CONFIGURATION ---
-# Define required column names
+# Primary Column Names (New Names)
 DATE_COLUMN = 'Deal date' 
 VALUE_COLUMN = 'Amount raised (converted to GBP)' 
+
+# Alternative Column Names (Original Names for Backwards Compatibility)
+ALT_DATE_COLUMN = 'Date the participant received the grant'
+ALT_VALUE_COLUMN = 'Amount received (converted to GBP)'
+
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
 # Define the default single bar color (third color in the palette for a lighter tone)
@@ -78,18 +83,29 @@ def is_dark_color(hex_color):
 
 @st.cache_data
 def load_data(uploaded_file):
-    """Loads and preprocesses the uploaded file."""
+    """Loads and preprocesses the uploaded file, handling dual column names."""
     if uploaded_file.name.endswith('.csv'):
         data = pd.read_csv(uploaded_file)
     else:
         # Load the first sheet
         data = pd.read_excel(uploaded_file, sheet_name=0)
         
-    # FIX: Clean column names by stripping whitespace
+    # 1. Clean column names by stripping whitespace
     data.columns = data.columns.str.strip()
-        
-    if DATE_COLUMN not in data.columns or VALUE_COLUMN not in data.columns:
-        return None, f"File must contain columns: **`{DATE_COLUMN}`** and **`{VALUE_COLUMN}`**."
+    
+    # 2. Check and rename date column
+    if DATE_COLUMN not in data.columns:
+        if ALT_DATE_COLUMN in data.columns:
+            data.rename(columns={ALT_DATE_COLUMN: DATE_COLUMN}, inplace=True)
+        else:
+            return None, f"File must contain a date column named **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**."
+
+    # 3. Check and rename value column
+    if VALUE_COLUMN not in data.columns:
+        if ALT_VALUE_COLUMN in data.columns:
+            data.rename(columns={ALT_VALUE_COLUMN: VALUE_COLUMN}, inplace=True)
+        else:
+            return None, f"File must contain a value column named **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**."
 
     try:
         data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], errors='coerce')
@@ -628,7 +644,5 @@ else:
     st.markdown("---")
     st.subheader("Expected Data Format")
     st.markdown(f"""
-    Your file must contain, at minimum, these two columns:
-    * **Date Column:** `{DATE_COLUMN}` (e.g., '2023-01-15')
-    * **Value Column:** `{VALUE_COLUMN}` (e.g., '150000')
+    Your file must contain, at minimum, a date column (either **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**) and a value column (either **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**).
     """)
