@@ -75,7 +75,7 @@ def load_data(uploaded_file):
     if uploaded_file.name.endswith('.csv'):
         data = pd.read_csv(uploaded_file)
     else:
-        # Load the first sheet without warning
+        # Load the first sheet
         data = pd.read_excel(uploaded_file, sheet_name=0)
         
     if DATE_COLUMN not in data.columns or VALUE_COLUMN not in data.columns:
@@ -247,6 +247,10 @@ optionally broken down by a category column, alongside the **Number of Deals** (
 """)
 st.markdown("---")
 
+# Initialize buffers for downloads
+buf_png = BytesIO()
+buf_svg = BytesIO()
+
 # Use a sidebar for controls
 with st.sidebar:
     st.header("1. Upload Data")
@@ -259,7 +263,6 @@ with st.sidebar:
             st.error(error_msg)
             st.stop()
         
-        # Streamlined feedback
         st.caption(f"Loaded **{df.shape[0]}** rows for processing.")
         
     if df is not None:
@@ -295,14 +298,44 @@ with st.sidebar:
             st.warning("Please select at least one element (Bars or Line) to display the chart.")
             st.stop()
         
+        # Store these variables for the main loop
+        st.session_state['year_range'] = year_range
+        st.session_state['category_column'] = category_column
+        st.session_state['show_bars'] = show_bars
+        st.session_state['show_line'] = show_line
+        
+        # --- DOWNLOAD SECTION (Sidebar) ---
         st.markdown("---")
-        st.header("3. Data Preview")
-        st.dataframe(df.head(), use_container_width=True)
+        st.header("3. Download Chart ⬇️")
+        
+        # These buttons will be populated later after the chart is generated
+        st.download_button(
+            label="Download Chart as **PNG** 🖼️",
+            data=st.session_state.get('buf_png', BytesIO()),
+            file_name="grant_funding_chart.png",
+            mime="image/png",
+            key="download_png",
+            use_container_width=True
+        )
+        st.download_button(
+            label="Download Chart as **SVG** 📐",
+            data=st.session_state.get('buf_svg', BytesIO()),
+            file_name="grant_funding_chart.svg",
+            mime="image/svg+xml",
+            key="download_svg",
+            use_container_width=True
+        )
 
 
-# --- MAIN AREA: CHART GENERATION & DOWNLOAD ---
+# --- MAIN AREA: CHART GENERATION ---
 
-if df is not None and ('year_range' in locals() or 'year_range' in globals()):
+if df is not None:
+    
+    # Retrieve parameters from session state
+    year_range = st.session_state.get('year_range')
+    category_column = st.session_state.get('category_column')
+    show_bars = st.session_state.get('show_bars')
+    show_line = st.session_state.get('show_line')
     
     # Process the data
     final_data, process_error = process_data(df, year_range, category_column)
@@ -317,37 +350,20 @@ if df is not None and ('year_range' in locals() or 'year_range' in globals()):
     st.subheader("Generated Chart")
     st.pyplot(chart_fig, use_container_width=True)
     
-    st.markdown("---")
+    # --- Export Figure to Buffers (to update sidebar download buttons) ---
     
-    # --- DOWNLOAD SECTION (Moved below the chart) ---
-    st.subheader("Download Chart ⬇️")
-    
-    col_download1, col_download2 = st.columns(2)
-    
-    # PNG download
+    # PNG
     buf_png = BytesIO()
     chart_fig.savefig(buf_png, format='png', dpi=300, bbox_inches='tight')
     buf_png.seek(0)
-    
-    with col_download1:
-        st.download_button(
-            label="Download Chart as **PNG** 🖼️",
-            data=buf_png,
-            file_name="grant_funding_chart.png",
-            mime="image/png",
-            use_container_width=True
-        )
-        
-    # SVG download
+    st.session_state['buf_png'] = buf_png # Update session state
+
+    # SVG
     buf_svg = BytesIO()
     chart_fig.savefig(buf_svg, format='svg', bbox_inches='tight')
     buf_svg.seek(0)
+    st.session_state['buf_svg'] = buf_svg # Update session state
     
-    with col_download2:
-        st.download_button(
-            label="Download Chart as **SVG** 📐",
-            data=buf_svg,
-            file_name="grant_funding_chart.svg",
-            mime="image/svg+xml",
-            use_container_width=True
-        )
+    # Rerunning helps ensure the download buttons are active if this is the first run
+    # Since st.pyplot is called, a rerun is often triggered automatically, but this ensures state is updated.
+    # Note: Streamlit handles the refresh loop, the download buttons in the sidebar should now work.
