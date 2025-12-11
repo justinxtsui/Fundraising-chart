@@ -18,8 +18,8 @@ SINGLE_BAR_COLOR = '#BBBAF6'
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
 TITLE_COLOR = '#000000' # Matplotlib Chart Title Color is Black
-# Define the Application Title Color (Dark Berry)
-APP_TITLE_COLOR = '#6F2A58' 
+# Define the Application Title Color (UPDATED TO BLACK)
+APP_TITLE_COLOR = '#000000' 
 # Default Title
 DEFAULT_TITLE = 'Grant Funding and Deal Count Over Time'
 
@@ -191,7 +191,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
             for i, x in enumerate(x_pos):
                 val = final_data[cat].iloc[i]
                 if val > 0 and show_bars:
-                    label_text = format_currency(val) # Definition is here
+                    label_text = format_currency(val)
                     current_color = color
                     text_color = '#FFFFFF' if is_dark_color(current_color) else '#000000'
                     
@@ -205,7 +205,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                         y_pos = bottom[i] + val / 2
                         va = 'center'
                         
-                    chart_ax1.text(x, y_pos, label_text, ha='center', va=va, # Access is here
+                    chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
                                      fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
             bottom += final_data[cat].values
     else:
@@ -217,7 +217,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
             for i, x in enumerate(x_pos):
                 val = final_data[VALUE_COLUMN].iloc[i]
                 if val > 0:
-                    label_text = format_currency(val) # Definition is here
+                    label_text = format_currency(val)
                     text_color = '#FFFFFF' if is_dark_color(SINGLE_BAR_COLOR) else '#000000'
 
                     # Vertical positioning logic (near the base):
@@ -225,7 +225,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     y_pos = vertical_offset
                     va = 'bottom'
                         
-                    chart_ax1.text(x, y_pos, label_text, ha='center', va=va, # Access is here
+                    chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
                                      fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
     
     chart_ax1.set_xticks(x_pos)
@@ -355,7 +355,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 # --- STREAMLIT APP LAYOUT ---
 
 # 1. MAIN APPLICATION TITLE
-st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True)
+# REMOVED EXTRA st.markdown("---") to move the line closer
+st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True) 
 st.markdown("---")
 
 # Initialize buffers and session state
