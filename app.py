@@ -128,8 +128,12 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     bar_width = 0.8
     x_pos = np.arange(len(final_data))
     
-    # 1. SYNCHRONIZE ALL FONT SIZES (as requested)
-    DYNAMIC_FONT_SIZE = max(8, min(14, int(50 / len(final_data)) * 3))
+    # Base font size calculation (scales dynamically with the number of bars/width)
+    base_font_size = max(8, min(14, int(50 / len(final_data)) * 3))
+    
+    # Define font sizes: Bar labels are one size smaller for better internal fit
+    BAR_LABEL_FONT_SIZE = max(6, base_font_size - 1)
+    AXIS_LINE_FONT_SIZE = base_font_size
     
     category_cols = []
     if category_column != 'None':
@@ -159,7 +163,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     current_color = color
                     text_color = '#FFFFFF' if is_dark_color(current_color) else '#000000'
                     
-                    # 2. REVERTED POSITIONING LOGIC for STACKED BARS
+                    # Vertical positioning logic (reverted to original behavior):
                     if idx == 0:
                         # Bottom segment: placed just above the x-axis
                         y_pos = vertical_offset
@@ -170,7 +174,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                         va = 'center'
                         
                     chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
-                                   fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
+                                   fontsize=BAR_LABEL_FONT_SIZE, fontweight='bold', color=text_color) # <-- BAR LABEL FONT SIZE
             bottom += final_data[cat].values
     else:
         if show_bars:
@@ -183,19 +187,19 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     label_text = format_currency(val)
                     text_color = '#FFFFFF' if is_dark_color(SINGLE_BAR_COLOR) else '#000000'
 
-                    # 2. REVERTED POSITIONING LOGIC for SINGLE BARS
+                    # Vertical positioning logic (reverted to original behavior):
                     # Placed just above the x-axis
                     y_pos = vertical_offset
                     va = 'bottom'
                         
                     chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
-                                   fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
+                                   fontsize=BAR_LABEL_FONT_SIZE, fontweight='bold', color=text_color) # <-- BAR LABEL FONT SIZE
     
     chart_ax1.set_xticks(x_pos)
     chart_ax1.set_xticklabels(final_data['time_period'])
     
-    # Apply DYNAMIC_FONT_SIZE
-    plt.setp(chart_ax1.get_xticklabels(), fontsize=DYNAMIC_FONT_SIZE, fontweight='normal')
+    # Apply AXIS_LINE_FONT_SIZE
+    plt.setp(chart_ax1.get_xticklabels(), fontsize=AXIS_LINE_FONT_SIZE, fontweight='normal')
     
     chart_ax1.set_ylim(0, y_max * 1.1)
     chart_ax1.tick_params(axis='y', left=False, labelleft=False, right=False, labelright=False, length=0)
@@ -283,7 +287,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 y_pos = y - base_offset
             
             chart_ax2.text(x, y_pos, str(int(y)), ha='center', va=va, 
-                           fontsize=DYNAMIC_FONT_SIZE, # <-- USING DYNAMIC_FONT_SIZE
+                           fontsize=AXIS_LINE_FONT_SIZE, # <-- LINE LABEL FONT SIZE
                            color=LINE_COLOR, fontweight='bold')
     
     # --- LEGEND & TITLE ---
