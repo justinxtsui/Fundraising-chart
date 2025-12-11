@@ -231,7 +231,7 @@ if uploaded_file is not None:
                             else:
                                 text_color = 'black'
                                 
-                            # MODIFIED: Changed fontweight to 600 (Semi Bold)
+                            # Font weight is 600 (Semi Bold)
                             chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
                                     fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
                     
@@ -264,7 +264,7 @@ if uploaded_file is not None:
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
-                 fontweight='normal')
+                 fontweight=600) # MODIFIED: Changed fontweight to 600 (Semi Bold)
         
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
