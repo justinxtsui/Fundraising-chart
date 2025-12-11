@@ -359,9 +359,6 @@ st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</
 st.markdown("---")
 
 # Initialize buffers and session state
-# ----------------------------------------------------------------------
-# FIX: Initialize all session state keys to avoid the KeyError.
-# ----------------------------------------------------------------------
 if 'year_range' not in st.session_state:
     st.session_state['year_range'] = (1900, 2100)
     st.session_state['category_column'] = 'None'
@@ -374,7 +371,6 @@ if 'year_range' not in st.session_state:
     st.session_state['filter_column'] = 'None'
     st.session_state['filter_include'] = True
     st.session_state['filter_values'] = []
-# ----------------------------------------------------------------------
 
 
 # --- SIDEBAR (All Controls) ---
@@ -383,7 +379,9 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Upload your Excel or CSV file", type=['xlsx', 'xls', 'csv'], 
                                      help="The file must contain a date column and a value column.")
 
-    df_base = None
+    # Initialize df_base to None outside the conditional block
+    df_base = None 
+    
     if uploaded_file:
         df_base, error_msg = load_data(uploaded_file)
         if df_base is None:
@@ -400,8 +398,10 @@ with st.sidebar:
         
         # 2A. Time Range Selection
         st.subheader("Time Filters")
+        
+        # FIX: Using df_base inside the conditional block
         min_year = int(df_base[DATE_COLUMN].dt.year.min())
-        max_year = int(df[DATE_COLUMN].dt.year.max())
+        max_year = int(df_base[DATE_COLUMN].dt.year.max())
         all_years = list(range(min_year, max_year + 1))
         
         default_start = min_year
@@ -488,7 +488,6 @@ with st.sidebar:
         st.markdown("---")
         st.header("3. Data Filter")
 
-        # Line 487 fix implemented here: st.session_state['filter_enabled'] is guaranteed to exist.
         filter_enabled = st.checkbox('Enable Data Filtering', value=st.session_state['filter_enabled'])
         st.session_state['filter_enabled'] = filter_enabled
 
@@ -623,4 +622,3 @@ else:
     * **Date Column:** `{DATE_COLUMN}` (e.g., '2023-01-15')
     * **Value Column:** `{VALUE_COLUMN}` (e.g., '150000')
     """)
-    
