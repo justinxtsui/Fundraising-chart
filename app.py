@@ -231,7 +231,7 @@ if uploaded_file is not None:
                             else:
                                 text_color = 'black'
                                 
-                            # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
+                            # Font family confirmed as 'Public Sans'
                             chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
                                     fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color=text_color)
                     
@@ -250,7 +250,7 @@ if uploaded_file is not None:
                     if val > 0:
                         label_text = format_currency(val)
                         # Alignment is ha='center' 
-                        # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
+                        # Font family confirmed as 'Public Sans'
                         chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
                                 fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color='black')
         
@@ -260,7 +260,7 @@ if uploaded_file is not None:
         # Ensure year labels use dynamic font size
         chart_ax1.set_xticklabels(final_data['time_period'])
         
-        # Set font properties for X-axis ticks (Year). Size is already dynamic_font_size.
+        # Set font properties for X-axis ticks (Year) - Family confirmed as 'Public Sans'
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
@@ -316,7 +316,7 @@ if uploaded_file is not None:
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
                 offset = y_range * 0.02
                 
-                # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
+                # Font family confirmed as 'Public Sans'
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
                             fontfamily='Public Sans', color=text_color, fontweight='normal')
@@ -352,7 +352,7 @@ if uploaded_file is not None:
         chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
                     prop={'family': 'Public Sans', 'weight': 'normal'}, labelspacing=1.2)
         
-        # Title uses fontweight=600 (Semi Bold)
+        # Title uses fontweight=600 (Semi Bold) and fontfamily='Public Sans'
         plt.title('Data Visualization', fontsize=14, fontweight=600, pad=20, fontfamily='Public Sans')
         plt.tight_layout()
         
