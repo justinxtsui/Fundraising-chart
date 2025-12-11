@@ -192,7 +192,7 @@ if uploaded_file is not None:
         if category_column != 'None':
             category_cols = [col for col in final_data.columns if col not in ['time_period', 'row_count']]
 
-        # CORRECTED LINE: Calculate y_max for plot limits and vertical offset
+        # Calculate y_max for plot limits and vertical offset
         if category_column == 'None':
             y_max = final_data[value_column].max()
         else:
@@ -254,7 +254,7 @@ if uploaded_file is not None:
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
-        # Year labels use dynamic font size and normal weight
+        # Year labels use dynamic font size and normal weight (font size matches dynamic_font_size)
         chart_ax1.set_xticklabels(final_data['time_period'], fontfamily='Public Sans', fontsize=dynamic_font_size, fontweight='normal')
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
