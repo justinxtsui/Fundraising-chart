@@ -332,9 +332,9 @@ if uploaded_file is not None:
                 # Determine text color based on position
                 text_color = '#000000'  # Default for labels above (on white background)
                 
-                # Calculate base offset
+                # Calculate base offset - back to original size
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
-                base_offset = y_range * 0.08  # Base offset for separation
+                base_offset = y_range * 0.03  # Back to original small offset
                 
                 # Check for potential overlap with bar labels when placing below
                 if place_below and category_column != 'None':
@@ -369,11 +369,11 @@ if uploaded_file is not None:
                         bar_label_position_line_scale = (bar_label_position / bar_ax1_max) * line_ax2_max
                         
                         # If within danger zone, need extra offset
-                        danger_zone = y_range * 0.15  # Labels should be at least this far apart
+                        danger_zone = y_range * 0.12  # Labels should be at least this far apart
                         if abs(label_position - bar_label_position_line_scale) < danger_zone:
                             needs_extra_offset = True
-                            # Increase offset to avoid collision
-                            base_offset = y_range * 0.18
+                            # Increase offset to avoid collision, but not too much
+                            base_offset = y_range * 0.08
                             break
                         
                         # Determine segment color for contrast
