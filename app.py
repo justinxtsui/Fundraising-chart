@@ -128,14 +128,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     bar_width = 0.8
     x_pos = np.arange(len(final_data))
     
-    # Base font size calculation
-    base_font_size = max(8, min(14, int(50 / len(final_data)) * 3))
-    
-    # Define new font sizes based on base_font_size
-    # Bar labels are one size smaller
-    BAR_LABEL_FONT_SIZE = max(6, base_font_size - 1) 
-    # Line and X-Axis labels are the same size
-    AXIS_AND_LINE_FONT_SIZE = base_font_size + 1      
+    # 1. RE-SYNCHRONIZE ALL FONT SIZES (as requested)
+    DYNAMIC_FONT_SIZE = max(8, min(14, int(50 / len(final_data)) * 3))
     
     category_cols = []
     if category_column != 'None':
@@ -146,7 +140,10 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     else:
         y_max = final_data[category_cols].sum(axis=1).max()
 
-    vertical_offset = y_max * 0.01 
+    # Define a threshold for relative bar positioning
+    # If a bar segment is shorter than this, the label will be placed near the bottom edge.
+    MIN_RELATIVE_HEIGHT_THRESHOLD = y_max * 0.05 # 5% of the total max Y-axis value
+    BAR_BOTTOM_PADDING_RATIO = 0.1 # Pad 10% of the segment height from the bottom edge
     
     # --- AXIS 1 (Bar Chart - Value) ---
     if category_column != 'None':
@@ -164,15 +161,21 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     current_color = color
                     text_color = '#FFFFFF' if is_dark_color(current_color) else '#000000'
                     
-                    if idx == 0:
-                        y_pos = vertical_offset
-                        va = 'bottom'
+                    segment_bottom = bottom[i]
+                    segment_height = val
+                    
+                    # 2. RELATIVE POSITIONING LOGIC for STACKED BARS
+                    if segment_height < MIN_RELATIVE_HEIGHT_THRESHOLD:
+                        # Bar segment is too short: place label just above the segment's floor
+                        y_pos = segment_bottom + (segment_height * BAR_BOTTOM_PADDING_RATIO)
+                        va = 'bottom' 
                     else:
-                        y_pos = bottom[i] + val / 2
+                        # Bar segment is tall enough: center the label vertically
+                        y_pos = segment_bottom + segment_height / 2
                         va = 'center'
                         
                     chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
-                                   fontsize=BAR_LABEL_FONT_SIZE, fontweight='bold', color=text_color)
+                                   fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
             bottom += final_data[cat].values
     else:
         if show_bars:
@@ -184,13 +187,27 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 if val > 0:
                     label_text = format_currency(val)
                     text_color = '#FFFFFF' if is_dark_color(SINGLE_BAR_COLOR) else '#000000'
-                    chart_ax1.text(x, vertical_offset, label_text, ha='center', va='bottom',
-                                   fontsize=BAR_LABEL_FONT_SIZE, fontweight='bold', color=text_color)
+
+                    # 2. RELATIVE POSITIONING LOGIC for SINGLE BARS
+                    segment_height = val
+                    
+                    if segment_height < MIN_RELATIVE_HEIGHT_THRESHOLD:
+                        # Bar is too short: place label just above the x-axis (segment floor is 0)
+                        y_pos = segment_height * BAR_BOTTOM_PADDING_RATIO
+                        va = 'bottom'
+                    else:
+                        # Bar is tall enough: center the label vertically
+                        y_pos = segment_height / 2
+                        va = 'center'
+                        
+                    chart_ax1.text(x, y_pos, label_text, ha='center', va=va,
+                                   fontsize=DYNAMIC_FONT_SIZE, fontweight='bold', color=text_color)
     
     chart_ax1.set_xticks(x_pos)
     chart_ax1.set_xticklabels(final_data['time_period'])
     
-    plt.setp(chart_ax1.get_xticklabels(), fontsize=AXIS_AND_LINE_FONT_SIZE, fontweight='normal')
+    # Apply DYNAMIC_FONT_SIZE
+    plt.setp(chart_ax1.get_xticklabels(), fontsize=DYNAMIC_FONT_SIZE, fontweight='normal')
     
     chart_ax1.set_ylim(0, y_max * 1.1)
     chart_ax1.tick_params(axis='y', left=False, labelleft=False, right=False, labelright=False, length=0)
@@ -278,7 +295,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 y_pos = y - base_offset
             
             chart_ax2.text(x, y_pos, str(int(y)), ha='center', va=va, 
-                           fontsize=AXIS_AND_LINE_FONT_SIZE, 
+                           fontsize=DYNAMIC_FONT_SIZE, # <-- USING DYNAMIC_FONT_SIZE
                            color=LINE_COLOR, fontweight='bold')
     
     # --- LEGEND & TITLE ---
@@ -394,7 +411,6 @@ with st.sidebar:
 
         # --- Display Options ---
         st.subheader("Chart Elements")
-        # Ensure parentheses are correctly closed
         show_bars = st.checkbox(
             "Show Total Grant Amount Bars", 
             value=st.session_state.get('show_bars', True), 
