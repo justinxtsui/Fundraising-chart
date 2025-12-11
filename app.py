@@ -207,10 +207,44 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
         base_offset = y_range * 0.015
         
+        # --- IMPROVED LINE LABEL PLACEMENT LOGIC ---
         for i, (x, y) in enumerate(zip(x_pos, line_data)):
-            place_below = (i % 2 == 0)
-            va = 'top' if place_below else 'bottom'
-            y_pos = y - base_offset if place_below else y + base_offset
+            
+            place_below = False # Default to placing label ABOVE (va='bottom')
+            
+            # Check for local peak conflict: point is higher than both neighbors
+            # Edge cases (first/last point) are handled by short-circuiting logic
+            
+            # Check left neighbor
+            if i > 0 and y < line_data.iloc[i-1]:
+                # If the point is lower than the left neighbor, it's NOT a peak from the left.
+                pass
+            elif i > 0 and y >= line_data.iloc[i-1]:
+                # If the point is higher or equal to the left neighbor, continue checking right
+                if i < len(line_data) - 1 and y >= line_data.iloc[i+1]:
+                    # Point is higher than or equal to BOTH neighbors (local peak)
+                    place_below = True
+            
+            # Special case for the start/end point being the highest or lowest relative to ONE neighbor
+            if len(line_data) == 1:
+                # Single point, always place above
+                place_below = False
+            elif i == 0 and len(line_data) > 1 and y >= line_data.iloc[i+1]:
+                # First point is a peak relative to its only neighbor
+                place_below = True
+            elif i == len(line_data) - 1 and len(line_data) > 1 and y >= line_data.iloc[i-1]:
+                # Last point is a peak relative to its only neighbor
+                place_below = True
+
+            
+            if place_below:
+                # Place BELOW the dot (va='top', text hangs below y_pos)
+                va = 'top' 
+                y_pos = y - base_offset
+            else:
+                # Default: Place ABOVE the dot (va='bottom', text sits on top of y_pos)
+                va = 'bottom'
+                y_pos = y + base_offset
             
             chart_ax2.text(x, y_pos, str(int(y)), ha='center', va=va, fontsize=dynamic_font_size, 
                            color=LINE_COLOR, fontweight='bold')
@@ -243,7 +277,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # --- STREAMLIT APP LAYOUT ---
 
-st.title("📊 Dynamic Grant Funding Chart Generator")
+st.title("Dynamic Grant Funding Chart Generator")
 st.markdown("---")
 
 # Initialize buffers and session state
@@ -351,10 +385,10 @@ with st.sidebar:
         
         # --- DOWNLOAD SECTION (Sidebar) ---
         st.markdown("---")
-        st.header("3. Download Chart ⬇️")
+        st.header("3. Download Chart")
         
         st.download_button(
-            label="Download Chart as **PNG** 🖼️",
+            label="Download Chart as **PNG**",
             data=st.session_state.get('buf_png', BytesIO()),
             file_name=f"{custom_title.replace(' ', '_').lower()}_chart.png",
             mime="image/png",
@@ -362,7 +396,7 @@ with st.sidebar:
             use_container_width=True
         )
         st.download_button(
-            label="Download Chart as **SVG** 📐",
+            label="Download Chart as **SVG**",
             data=st.session_state.get('buf_svg', BytesIO()),
             file_name=f"{custom_title.replace(' ', '_').lower()}_chart.svg",
             mime="image/svg+xml",
