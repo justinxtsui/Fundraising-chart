@@ -209,52 +209,47 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
         base_offset = y_range * 0.025 
         
-        # --- FINALIZED PEAK/VALLEY/SLOPE PLACEMENT LOGIC ---
+        # --- FINAL SIMPLIFIED SLOPE-BASED PLACEMENT LOGIC ---
         num_points = len(line_data)
         
         for i, y in enumerate(line_data):
             x = x_pos[i]
             
-            # Default placement is BELOW (va='top')
-            place_above = False
+            # Default placement is ABOVE (va='bottom') for single points or if slope is flat/unknown
+            place_above = True
             
             if num_points > 1:
-                # Get neighbors safely (using y-1 for comparison safety)
-                y_prev = line_data[i-1] if i > 0 else y - 1 
-                y_next = line_data[i+1] if i < num_points - 1 else y - 1
-                
-                # Check Local Peak: higher than or equal to both neighbors
-                is_peak = (y >= y_prev) and (y >= y_next)
-                
-                # Check Local Valley: lower than or equal to both neighbors
-                is_valley = (y <= y_prev) and (y <= y_next)
-
-                # --- Decision ---
-                if is_peak:
-                    # High point (like 214): Place BELOW the dot (Away from the top margin/header).
-                    place_above = False 
-                elif is_valley:
-                    # Low point (like 89): Place ABOVE the dot (Away from the bottom/bar chart).
-                    place_above = True
-                else:
-                    # Monotonic/Sloped point (Tiebreaker)
-                    # If line is falling (pull label above), if rising (pull label below)
-                    if i < num_points - 1:
-                        if y_next > y:
-                            # RISING slope: Place label BELOW (away from ascending line)
-                            place_above = False 
-                        elif y_next < y:
-                            # FALLING slope: Place label ABOVE (away from descending line)
-                            place_above = True
+                # 1. Determine direction from CURRENT point (y) to NEXT point (y_next)
+                if i < num_points - 1:
+                    y_next = line_data[i+1]
+                    
+                    if y_next > y:
+                        # RISING (Arrow points UP): Label goes ABOVE
+                        place_above = True
+                    elif y_next < y:
+                        # FALLING (Arrow points DOWN): Label goes BELOW
+                        place_above = False
+                    else:
+                        # FLAT segment: Use the placement of the previous point, or default to ABOVE
+                        if i > 0:
+                            y_prev = line_data[i-1]
+                            place_above = (y_prev < y) # If rising into flat, place above.
                         else:
-                            # Flat slope: Use incoming slope or default
-                            place_above = (y < y_prev) or (i == 0) # If falling in or start, go above
-                    elif i == num_points - 1:
-                        # Last point: Use incoming slope
-                        if y > y_prev: # Rising segment came in
-                            place_above = False # Place BELOW
-                        else: # Falling or Flat segment came in
-                            place_above = True # Place ABOVE
+                            place_above = True
+                
+                # 2. For the LAST POINT (i == num_points - 1): Use the INCOMING slope
+                else:
+                    y_prev = line_data[i-1]
+                    
+                    if y > y_prev:
+                        # RISING segment came in: Label goes ABOVE
+                        place_above = True
+                    elif y < y_prev:
+                        # FALLING segment came in: Label goes BELOW
+                        place_above = False
+                    else:
+                        # FLAT segment came in: Default to ABOVE
+                        place_above = True
 
             # Determine final vertical alignment and position
             if place_above:
