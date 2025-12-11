@@ -343,10 +343,9 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     legend_elements = []
     
     # Define large font size for legend
-    LEGEND_FONT_SIZE = 160  # Increased font size for better readability
-    # Calculate marker size proportional to font - using 0.1x multiplier for proper visual scale
-    # (markersize in matplotlib doesn't scale 1:1 with fontsize)
-    LEGEND_MARKER_SIZE = LEGEND_FONT_SIZE * 0.1
+    LEGEND_FONT_SIZE = 260  # Increased font size for better readability
+    # Keep marker size fixed at 16 points
+    LEGEND_MARKER_SIZE = 16
     
     if show_bars:
         if category_column != 'None':
