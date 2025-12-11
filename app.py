@@ -410,6 +410,7 @@ if 'year_range' not in st.session_state:
     st.session_state['filter_include'] = True
     st.session_state['filter_values'] = []
     st.session_state['original_value_column'] = 'raised'  # Default
+    st.session_state['stacked_enabled'] = False  # Default
 
 
 # --- SIDEBAR (All Controls) ---
@@ -433,12 +434,21 @@ with st.sidebar:
         
     if df_base is not None:
         
-        # --- 2. CHART CONFIGURATION ---
+        # --- 2. CHART TITLE ---
         st.markdown("---")
-        st.header("2. Chart Configuration")
+        st.header("2. Chart Title")
         
-        # 2A. Time Range Selection
-        st.subheader("Time Filters")
+        custom_title = st.text_input(
+            "Chart Title", 
+            value=st.session_state.get('chart_title', DEFAULT_TITLE),
+            key='chart_title_input',
+            help="Customize the title shown above the chart."
+        )
+        st.session_state['chart_title'] = custom_title
+        
+        # --- 3. TIME FILTERS ---
+        st.markdown("---")
+        st.header("3. Time Filters")
         
         # FIX: Using df_base inside the conditional block
         min_year = int(df_base[DATE_COLUMN].dt.year.min())
@@ -476,21 +486,9 @@ with st.sidebar:
             
         year_range = (start_year, end_year)
         
-        # 2B. Category Selection
-        st.subheader("Categorization")
-        config_columns = [col for col in df_base.columns if col not in [DATE_COLUMN, VALUE_COLUMN]]
-        category_columns = ['None'] + sorted(config_columns)
-        
-        category_column = st.selectbox(
-            "Category Column (Optional Split)", 
-            category_columns,
-            index=category_columns.index(st.session_state.get('category_column', 'None')),
-            key='category_col_selector',
-            help="Select a column to stack and color-code the bars."
-        )
-
-        # 2C. Chart Elements and Title
-        st.subheader("Visual Elements")
+        # --- 4. VISUAL ELEMENTS ---
+        st.markdown("---")
+        st.header("4. Visual Elements")
         
         col_elem_1, col_elem_2 = st.columns(2)
         
@@ -511,23 +509,36 @@ with st.sidebar:
             st.warning("Select at least one element.")
             st.stop()
         
-        custom_title = st.text_input(
-            "Chart Title", 
-            value=st.session_state.get('chart_title', DEFAULT_TITLE),
-            key='chart_title_input',
-            help="Customize the title shown above the chart."
-        )
-        st.session_state['chart_title'] = custom_title
-        
-        # Update session state with core config values
+        # Update session state
         st.session_state['year_range'] = year_range
-        st.session_state['category_column'] = category_column
         st.session_state['show_bars'] = show_bars
         st.session_state['show_line'] = show_line
-
-        # --- 3. DATA FILTER ---
+        
+        # --- 5. STACKED BAR (OPTIONAL) ---
         st.markdown("---")
-        st.header("3. Data Filter")
+        st.header("5. Stacked bar? (Optional)")
+
+        stacked_enabled = st.checkbox('Enable Stacked Bar', value=st.session_state.get('stacked_enabled', False))
+        st.session_state['stacked_enabled'] = stacked_enabled
+
+        if stacked_enabled:
+            config_columns = [col for col in df_base.columns if col not in [DATE_COLUMN, VALUE_COLUMN]]
+            category_columns = ['None'] + sorted(config_columns)
+            
+            category_column = st.selectbox(
+                "Select Column for Stacking", 
+                category_columns,
+                index=category_columns.index(st.session_state.get('category_column', 'None')),
+                key='category_col_selector',
+                help="Select a column to stack and color-code the bars."
+            )
+            st.session_state['category_column'] = category_column
+        else:
+            st.session_state['category_column'] = 'None'
+
+        # --- 6. DATA FILTER ---
+        st.markdown("---")
+        st.header("6. Data Filter")
 
         filter_enabled = st.checkbox('Enable Data Filtering', value=st.session_state['filter_enabled'])
         st.session_state['filter_enabled'] = filter_enabled
@@ -572,9 +583,9 @@ with st.sidebar:
             else:
                  st.session_state['filter_values'] = []
 
-        # --- 4. DOWNLOAD SECTION ---
+        # --- 7. DOWNLOAD SECTION ---
         st.markdown("---")
-        st.header("4. Download Chart")
+        st.header("7. Download Chart")
         
         with st.expander("Download Options", expanded=True):
             st.caption("Download your generated chart file.")
@@ -659,9 +670,13 @@ else:
     This generator creates professional time series charts visualizing value (bars) and count (line) over time.
 
     1.  **Upload:** Provide your data file in the sidebar.
-    2.  **Configure:** Use the controls under **'2. Chart Configuration'** to filter the time range, choose a category for stacking, and set the title.
-    3.  **Filter:** Use **'3. Data Filter'** to include or exclude specific data points based on column values.
-    4.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 4 of the sidebar.
+    2.  **Configure:** Use the controls in the sidebar sections to:
+        - Set your chart title (Section 2)
+        - Filter the time range (Section 3)
+        - Choose visual elements (Section 4)
+        - Enable stacked bars (Section 5)
+        - Apply data filters (Section 6)
+    3.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.
     """)
 
     st.markdown("---")
