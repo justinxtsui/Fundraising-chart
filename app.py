@@ -358,8 +358,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
                                       markerfacecolor=LINE_COLOR, markersize=15, label='Number of deals')) # Increased marker size
         
-    # **FINAL CHANGE:** Legend fontsize changed to 30
-    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=30, frameon=False, 
+    # **FINAL CHANGE:** Legend fontsize changed to DYNAMIC_FONT_SIZE
+    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=DYNAMIC_FONT_SIZE, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
     # Matplotlib Chart Title: Color is TITLE_COLOR (Black)
