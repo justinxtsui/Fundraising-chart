@@ -176,7 +176,7 @@ if uploaded_file is not None:
         # Create the chart
         chart_fig, chart_ax1 = plt.subplots(figsize=(10, 8))
         
-        # MODIFIED: Increased bar width to 0.8
+        # Increased bar width to 0.8
         bar_width = 0.8
         x_pos = np.arange(len(final_data))
         
@@ -202,7 +202,7 @@ if uploaded_file is not None:
             y_max = final_data[category_cols].sum(axis=1).max()
 
         # Define the fixed vertical offset for single bar labels
-        vertical_offset = y_max * 0.005 
+        vertical_offset = y_max * 0.005 # A very small percentage for 'just slightly above the bottom'
         
         # Determine if we have categories or not
         if category_column != 'None':
@@ -231,9 +231,9 @@ if uploaded_file is not None:
                             else:
                                 text_color = 'black'
                                 
-                            # Alignment is ha='center' for stacked bars
+                            # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
                             chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
-                                    fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
+                                    fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color=text_color)
                     
                     bottom += final_data[cat].values
         else:
@@ -250,8 +250,9 @@ if uploaded_file is not None:
                     if val > 0:
                         label_text = format_currency(val)
                         # Alignment is ha='center' 
+                        # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
                         chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
-                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color='black')
+                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color='black')
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
@@ -259,7 +260,7 @@ if uploaded_file is not None:
         # Ensure year labels use dynamic font size
         chart_ax1.set_xticklabels(final_data['time_period'])
         
-        # Set font properties for X-axis ticks (Year)
+        # Set font properties for X-axis ticks (Year). Size is already dynamic_font_size.
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
@@ -315,13 +316,13 @@ if uploaded_file is not None:
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
                 offset = y_range * 0.02
                 
-                # Font size is dynamic_font_size (matching other labels)
+                # MODIFIED: Changed fontweight from 600 to 'normal' for less bold text
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=600)
+                            fontfamily='Public Sans', color=text_color, fontweight='normal')
                 else:
                     chart_ax2.text(x, y + offset, str(y), ha='center', va='bottom', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=600)
+                            fontfamily='Public Sans', color=text_color, fontweight='normal')
             
             # Remove spines for second axis
             chart_ax2.spines['top'].set_visible(False)
