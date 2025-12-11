@@ -222,7 +222,6 @@ if uploaded_file is not None:
                         val = final_data[cat].iloc[i]
                         if val > 0:
                             label_text = format_currency(val)
-                            y_pos = bottom[i] + val / 2
                             
                             # Custom contrast logic: dark purple gets light text, all others get black
                             current_color = colors[idx % len(colors)]
@@ -230,10 +229,18 @@ if uploaded_file is not None:
                                 text_color = '#D3D3D3' # Light Grey for the dark purple
                             else:
                                 text_color = 'black'
-                                
-                            # Font weight is 600 (Semi Bold)
-                            chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
-                                    fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
+                            
+                            # Special positioning for bottom segment (first category)
+                            if idx == 0:
+                                # Bottom bar: position at bottom left with small vertical offset
+                                y_pos = vertical_offset
+                                chart_ax1.text(x, y_pos, label_text, ha='left', va='bottom',
+                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color=text_color)
+                            else:
+                                # Other segments: center positioning
+                                y_pos = bottom[i] + val / 2
+                                chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
+                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color=text_color)
                     
                     bottom += final_data[cat].values
         else:
@@ -249,10 +256,10 @@ if uploaded_file is not None:
                     val = final_data[value_column].iloc[i]
                     if val > 0:
                         label_text = format_currency(val)
-                        # Alignment is ha='center' 
-                        # Font weight is 600 (Semi Bold)
-                        chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
-                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color='black')
+                        # Alignment is ha='left' 
+                        # Font weight is 500 (Medium)
+                        chart_ax1.text(x, baseline_position, label_text, ha='left', va='bottom',
+                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color='black')
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
@@ -316,13 +323,13 @@ if uploaded_file is not None:
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
                 offset = y_range * 0.02
                 
-                # Font weight is 600 (Semi Bold)
+                # Font weight is 500 (Medium)
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=600)
+                            fontfamily='Public Sans', color=text_color, fontweight=500)
                 else:
                     chart_ax2.text(x, y + offset, str(y), ha='center', va='bottom', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=600)
+                            fontfamily='Public Sans', color=text_color, fontweight=500)
             
             # Remove spines for second axis
             chart_ax2.spines['top'].set_visible(False)
