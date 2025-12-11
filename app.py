@@ -260,7 +260,7 @@ if uploaded_file is not None:
         # Ensure year labels use dynamic font size
         chart_ax1.set_xticklabels(final_data['time_period'])
         
-        # MODIFIED: Set font properties for X-axis ticks (Year). Size is dynamic_font_size, Weight is 'normal'.
+        # Set font properties for X-axis ticks (Year). Size is dynamic_font_size, Weight is 'normal'.
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
@@ -270,7 +270,7 @@ if uploaded_file is not None:
                             right=False, labelright=False, length=0)
                             
         # Increased pad value to push year labels further down from the bars
-        chart_ax1.tick_params(axis='x', labelsize=12, bottom=False, length=0, pad=10)
+        chart_ax1.tick_params(axis='x', bottom=False, length=0, pad=10)
         
         # Remove spines
         chart_ax1.spines['top'].set_visible(False)
