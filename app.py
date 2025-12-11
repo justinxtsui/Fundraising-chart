@@ -254,8 +254,18 @@ if uploaded_file is not None:
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
-        # Year labels use dynamic font size and normal weight (font size matches dynamic_font_size)
-        chart_ax1.set_xticklabels(final_data['time_period'], fontfamily='Public Sans', fontsize=dynamic_font_size, fontweight='normal')
+        
+        # --- MODIFIED BLOCK FOR X-AXIS LABELS ---
+        # Set tick labels (years)
+        chart_ax1.set_xticklabels(final_data['time_period'])
+        
+        # Explicitly set the font size/style on the tick objects to ensure consistency
+        plt.setp(chart_ax1.get_xticklabels(),
+                 fontsize=dynamic_font_size,
+                 fontfamily='Public Sans',
+                 fontweight='normal')
+        # --- END MODIFIED BLOCK ---
+        
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
         chart_ax1.tick_params(axis='x', labelsize=12, bottom=False, length=0)
