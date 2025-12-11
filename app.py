@@ -394,5 +394,83 @@ with st.sidebar:
 
         # --- Display Options ---
         st.subheader("Chart Elements")
+        # Ensure parentheses are correctly closed
         show_bars = st.checkbox(
-            "Show Total Grant Amount Bars",
+            "Show Total Grant Amount Bars", 
+            value=st.session_state.get('show_bars', True), 
+            key='show_bars_selector'
+        )
+        show_line = st.checkbox(
+            "Show Deal Count Line", 
+            value=st.session_state.get('show_line', True), 
+            key='show_line_selector'
+        )
+        
+        if not show_bars and not show_line:
+            st.warning("Please select at least one element (Bars or Line) to display the chart.")
+            st.stop()
+        
+        # Update session state with new values
+        st.session_state['year_range'] = year_range
+        st.session_state['category_column'] = category_column
+        st.session_state['show_bars'] = show_bars
+        st.session_state['show_line'] = show_line
+        
+        # --- DOWNLOAD SECTION (Sidebar) ---
+        st.markdown("---")
+        st.header("3. Download Chart")
+        
+        st.download_button(
+            label="Download Chart as **PNG**",
+            data=st.session_state.get('buf_png', BytesIO()),
+            file_name=f"{custom_title.replace(' ', '_').lower()}_chart.png",
+            mime="image/png",
+            key="download_png",
+            use_container_width=True
+        )
+        st.download_button(
+            label="Download Chart as **SVG**",
+            data=st.session_state.get('buf_svg', BytesIO()),
+            file_name=f"{custom_title.replace(' ', '_').lower()}_chart.svg",
+            mime="image/svg+xml",
+            key="download_svg",
+            use_container_width=True
+        )
+
+
+# --- MAIN AREA: CHART GENERATION ---
+
+if df is not None:
+    
+    # Retrieve parameters from session state
+    year_range = st.session_state['year_range']
+    category_column = st.session_state['category_column']
+    show_bars = st.session_state['show_bars']
+    show_line = st.session_state['show_line']
+    chart_title = st.session_state['chart_title']
+    
+    # Process the data
+    final_data, process_error = process_data(df, year_range, category_column)
+    
+    if final_data is None:
+        st.error(process_error)
+        st.stop()
+    
+    # Generate the chart, passing the custom title
+    chart_fig = generate_chart(final_data, category_column, show_bars, show_line, chart_title)
+
+    st.pyplot(chart_fig, use_container_width=True)
+    
+    # --- Export Figure to Buffers (to update sidebar download buttons) ---
+    
+    # PNG
+    buf_png = BytesIO()
+    chart_fig.savefig(buf_png, format='png', dpi=300, bbox_inches='tight')
+    buf_png.seek(0)
+    st.session_state['buf_png'] = buf_png
+
+    # SVG
+    buf_svg = BytesIO()
+    chart_fig.savefig(buf_svg, format='svg', bbox_inches='tight')
+    buf_svg.seek(0)
+    st.session_state['buf_svg'] = buf_svg
