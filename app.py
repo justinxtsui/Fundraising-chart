@@ -342,30 +342,32 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     # --- LEGEND & TITLE ---
     legend_elements = []
     
-    # Define large fixed size for markers and font
-    LEGEND_SIZE = 80 # Set fixed size to 80 for larger, more visible legend
+    # Define large font size for legend
+    LEGEND_FONT_SIZE = 120  # Increased font size for better readability
+    # Calculate marker size proportional to font (0.5x for visual balance)
+    LEGEND_MARKER_SIZE = LEGEND_FONT_SIZE * 0.5
     
     if show_bars:
         if category_column != 'None':
             for idx, cat in enumerate(category_cols):
                 color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
-                # Use large fixed size for marker size
+                # Use proportional marker size
                 legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                              markerfacecolor=color, markersize=LEGEND_SIZE, label=cat)) 
+                                              markerfacecolor=color, markersize=LEGEND_MARKER_SIZE, label=cat)) 
         else:
             # UPDATED LEGEND LABEL
-            # Use large fixed size for marker size
+            # Use proportional marker size
             legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_SIZE, label='Total amount received')) 
+                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE, label='Total amount received')) 
             
     if show_line:
         # UPDATED LEGEND LABEL
-        # Use large fixed size for marker size
+        # Use proportional marker size
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                      markerfacecolor=LINE_COLOR, markersize=LEGEND_SIZE, label='Number of deals')) 
+                                      markerfacecolor=LINE_COLOR, markersize=LEGEND_MARKER_SIZE, label='Number of deals')) 
         
-    # **FINAL CHANGE:** Legend fontsize changed to 80 (LEGEND_SIZE)
-    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=LEGEND_SIZE, frameon=False, 
+    # Legend with increased font size and proportional markers
+    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=LEGEND_FONT_SIZE, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
     # Matplotlib Chart Title: Color is TITLE_COLOR (Black)
