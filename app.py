@@ -343,7 +343,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     legend_elements = []
     
     # Define large fixed size for markers and font
-    LEGEND_SIZE = 50 # Set fixed size to 50
+    LEGEND_SIZE = 80 # Set fixed size to 80 for larger, more visible legend
     
     if show_bars:
         if category_column != 'None':
@@ -364,7 +364,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
                                       markerfacecolor=LINE_COLOR, markersize=LEGEND_SIZE, label='Number of deals')) 
         
-    # **FINAL CHANGE:** Legend fontsize changed to 50 (LEGEND_SIZE)
+    # **FINAL CHANGE:** Legend fontsize changed to 80 (LEGEND_SIZE)
     chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=LEGEND_SIZE, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
