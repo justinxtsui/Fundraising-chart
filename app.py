@@ -163,8 +163,7 @@ def process_data(df, year_range, category_column):
 def generate_chart(final_data, category_column, show_bars, show_line, chart_title):
     """Generates the dual-axis Matplotlib chart."""
     # INCREASED figsize for larger chart display
-    # NOTE: When use_container_width=True is used below, the width here primarily influences the aspect ratio/height.
-    chart_fig, chart_ax1 = plt.subplots(figsize=(15, 8)) 
+    chart_fig, chart_ax1 = plt.subplots(figsize=(20, 10)) 
     
     bar_width = 0.8
     x_pos = np.arange(len(final_data))
@@ -604,11 +603,12 @@ if 'df_base' in locals() and df_base is not None:
     chart_fig = generate_chart(final_data, st.session_state['category_column'], st.session_state['show_bars'], st.session_state['show_line'], st.session_state['chart_title'])
 
     # --- CHART CENTERING IMPROVEMENT ---
-    # Centering and sizing adjustment: [0.5, 5, 0.5] means the chart takes 5/6 (approx 83%) of the main page width.
-    col_left, col_chart, col_right = st.columns([0.5, 5, 0.5])
+    # Centering and sizing adjustment: Reduced the side margins to [0.05, 7, 0.05] 
+    # to maximize width, and kept use_container_width=True to fill the allocated 7/7.1 width.
+    col_left, col_chart, col_right = st.columns([0.05, 7, 0.05])
     
     with col_chart:
-        # UPDATED: use_container_width=True to fill the allocated column space
+        # Display the chart. use_container_width=True fills the allocated column space.
         st.pyplot(chart_fig, use_container_width=True) 
     
     # --- Export Figure to Buffers (for download buttons) ---
