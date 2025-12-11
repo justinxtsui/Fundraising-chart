@@ -8,8 +8,10 @@ from matplotlib.colors import to_rgb
 
 # --- CONFIGURATION ---
 # Define required column names
-DATE_COLUMN = 'Date the participant received the grant'
-VALUE_COLUMN = 'Amount received (converted to GBP)'
+# UPDATED: DATE_COLUMN changed from 'Date the participant received the grant' to 'Deal date'
+DATE_COLUMN = 'Deal date' 
+# UPDATED: VALUE_COLUMN changed from 'Amount received (converted to GBP)' to 'Amount raised (converted to GBP)'
+VALUE_COLUMN = 'Amount raised (converted to GBP)' 
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
 # Define the default single bar color (third color in the palette for a lighter tone)
