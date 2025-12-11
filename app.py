@@ -127,6 +127,18 @@ if uploaded_file is not None:
                 return formatted
         else:
             return f'£{value:.2f}'
+    
+    # Function to check if a color is dark (needs light text) or light (needs dark text)
+    def is_dark_color(hex_color):
+        """Check if a hex color is dark. Returns True if dark, False if light."""
+        # Remove the # if present
+        hex_color = hex_color.lstrip('#')
+        # Convert to RGB
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        # Calculate luminance
+        luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        # If luminance is less than 0.5, it's dark
+        return luminance < 0.5
 
     # Generate chart button
     if st.button("Generate Chart", type="primary"):
@@ -223,24 +235,24 @@ if uploaded_file is not None:
                         if val > 0:
                             label_text = format_currency(val)
                             
-                            # Custom contrast logic: dark purple gets light text, all others get black
+                            # Better contrast logic using is_dark_color function
                             current_color = colors[idx % len(colors)]
-                            if current_color == '#6F2A58': 
-                                text_color = '#D3D3D3' # Light Grey for the dark purple
+                            if is_dark_color(current_color):
+                                text_color = 'white'  # Light text for dark backgrounds
                             else:
-                                text_color = 'black'
+                                text_color = 'black'  # Dark text for light backgrounds
                             
                             # Special positioning for bottom segment (first category)
                             if idx == 0:
-                                # Bottom bar: position at bottom left with small vertical offset
+                                # Bottom bar: position at bottom center with small vertical offset
                                 y_pos = vertical_offset
-                                chart_ax1.text(x, y_pos, label_text, ha='left', va='bottom',
-                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color=text_color)
+                                chart_ax1.text(x, y_pos, label_text, ha='center', va='bottom',
+                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
                             else:
                                 # Other segments: center positioning
                                 y_pos = bottom[i] + val / 2
                                 chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
-                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color=text_color)
+                                        fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
                     
                     bottom += final_data[cat].values
         else:
@@ -256,10 +268,10 @@ if uploaded_file is not None:
                     val = final_data[value_column].iloc[i]
                     if val > 0:
                         label_text = format_currency(val)
-                        # Alignment is ha='left' 
-                        # Font weight is 500 (Medium)
-                        chart_ax1.text(x, baseline_position, label_text, ha='left', va='bottom',
-                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=500, color='black')
+                        # Alignment is ha='center' 
+                        # Font weight is 600 (Semi Bold)
+                        chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
+                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color='black')
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
@@ -295,15 +307,16 @@ if uploaded_file is not None:
                                 left=False, labelleft=False, length=0)
             chart_ax2.set_ylim(0, final_data['row_count'].max() * 1.5)
             
-            # Get category columns for contrast check (if categories are used)
+            # Define colors array for line label contrast checking
             if category_column != 'None':
                 colors = ['#EDD9E4', '#6F2A58', '#A8D5BA', '#FF6B6B', '#4ECDC4', '#FFE66D']
-                dark_color_index = colors.index('#6F2A58') if '#6F2A58' in colors else -1 # Check which index corresponds to the dark color
             
             # Add labels to line points
             for i, (x, y) in enumerate(zip(x_pos, final_data['row_count'])):
-                # Determine if label should go above or below
+                # Determine if label should go above or below based on neighboring points
                 place_below = False
+                
+                # Check if there are adjacent points that are higher
                 if i < len(final_data) - 1:
                     if final_data['row_count'].iloc[i+1] > y:
                         place_below = True
@@ -311,25 +324,53 @@ if uploaded_file is not None:
                     if final_data['row_count'].iloc[i-1] > y:
                         place_below = True
                 
-                # Apply contrast logic for line label: Check if the segment under the line dot is the dark purple one.
-                text_color = 'black'
-                if category_column != 'None' and dark_color_index != -1:
-                    # Check if the dark purple segment is the one with the highest value for this X-position
-                    segment_values = final_data[category_cols].iloc[i]
-                    if segment_values.idxmax() == category_cols[dark_color_index]:
-                         text_color = '#D3D3D3' # Light Grey
+                # Determine text color based on position
+                text_color = 'black'  # Default for labels above (on white background)
                 
-                # Calculate offset
+                if place_below and category_column != 'None':
+                    # Label is below the line point, potentially on a bar segment
+                    # Convert line y-position to bar chart scale to determine which segment
+                    # Get the bar values at this x position
+                    bar_ax1_max = chart_ax1.get_ylim()[1]
+                    line_ax2_max = chart_ax2.get_ylim()[1]
+                    
+                    # Estimate where the line point sits relative to the bars
+                    # Line y-position as fraction of its axis
+                    line_fraction = y / line_ax2_max
+                    # Approximate bar y-position
+                    approx_bar_y = line_fraction * bar_ax1_max
+                    
+                    # Find which segment this falls into
+                    cumulative_height = 0
+                    for seg_idx, cat in enumerate(category_cols):
+                        segment_value = final_data[cat].iloc[i]
+                        if approx_bar_y <= cumulative_height + segment_value:
+                            # This is the segment the label will be on
+                            segment_color = colors[seg_idx % len(colors)]
+                            if is_dark_color(segment_color):
+                                text_color = 'white'
+                            else:
+                                text_color = 'black'
+                            break
+                        cumulative_height += segment_value
+                elif place_below and category_column == 'None':
+                    # Single bar - check if it's the light purple
+                    if is_dark_color('#EDD9E4'):
+                        text_color = 'white'
+                    else:
+                        text_color = 'black'
+                
+                # Calculate offset with better spacing to avoid overlaps
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
-                offset = y_range * 0.02
+                offset = y_range * 0.04  # Increased from 0.02 for better spacing
                 
-                # Font weight is 500 (Medium)
+                # Font weight is 600 (Semi Bold)
                 if place_below:
-                    chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=500)
+                    chart_ax2.text(x, y - offset, str(int(y)), ha='center', va='top', fontsize=dynamic_font_size, 
+                            fontfamily='Public Sans', color=text_color, fontweight=600)
                 else:
-                    chart_ax2.text(x, y + offset, str(y), ha='center', va='bottom', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight=500)
+                    chart_ax2.text(x, y + offset, str(int(y)), ha='center', va='bottom', fontsize=dynamic_font_size, 
+                            fontfamily='Public Sans', color=text_color, fontweight=600)
             
             # Remove spines for second axis
             chart_ax2.spines['top'].set_visible(False)
