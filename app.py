@@ -18,7 +18,7 @@ SINGLE_BAR_COLOR = '#BBBAF6'
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
 TITLE_COLOR = '#000000' # Matplotlib Chart Title Color is Black
-# Define the Application Title Color (UPDATED TO BLACK)
+# Define the Application Title Color (Black)
 APP_TITLE_COLOR = '#000000' 
 # Default Title
 DEFAULT_TITLE = 'Grant Funding and Deal Count Over Time'
@@ -355,9 +355,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 # --- STREAMLIT APP LAYOUT ---
 
 # 1. MAIN APPLICATION TITLE
-# REMOVED EXTRA st.markdown("---") to move the line closer
-st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True) 
-st.markdown("---")
+st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True)
+st.markdown("---") # The divider is now correctly placed directly after the title HTML block
 
 # Initialize buffers and session state
 if 'year_range' not in st.session_state:
@@ -584,8 +583,12 @@ if 'df_base' in locals() and df_base is not None:
     # Generate the chart
     chart_fig = generate_chart(final_data, st.session_state['category_column'], st.session_state['show_bars'], st.session_state['show_line'], st.session_state['chart_title'])
 
-    # Display the chart directly in the main area
-    st.pyplot(chart_fig, use_container_width=True)
+    # --- CHART CENTERING IMPROVEMENT ---
+    # Use columns to push the content into the middle of the wide layout
+    col_left, col_chart, col_right = st.columns([1, 4, 1])
+    
+    with col_chart:
+        st.pyplot(chart_fig, use_container_width=False) # Use False to respect Matplotlib's size and allow centering
     
     # --- Export Figure to Buffers (for download buttons) ---
     
