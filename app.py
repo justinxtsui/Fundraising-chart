@@ -250,7 +250,7 @@ if uploaded_file is not None:
                     if val > 0:
                         label_text = format_currency(val)
                         # Alignment is ha='center' 
-                        # MODIFIED: Changed fontweight to 600 (Semi Bold)
+                        # Font weight is 600 (Semi Bold)
                         chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
                                 fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color='black')
         
@@ -260,11 +260,11 @@ if uploaded_file is not None:
         # Ensure year labels use dynamic font size
         chart_ax1.set_xticklabels(final_data['time_period'])
         
-        # Set font properties for X-axis ticks (Year)
+        # MODIFIED: Set font properties for X-axis ticks (Year). Size is dynamic_font_size, Weight is 'normal'.
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
-                 fontweight=600) # MODIFIED: Changed fontweight to 600 (Semi Bold)
+                 fontweight='normal') # Set to normal weight (not bold)
         
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
@@ -316,7 +316,7 @@ if uploaded_file is not None:
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
                 offset = y_range * 0.02
                 
-                # MODIFIED: Changed fontweight to 600 (Semi Bold)
+                # Font weight is 600 (Semi Bold)
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
                             fontfamily='Public Sans', color=text_color, fontweight=600)
