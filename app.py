@@ -213,8 +213,8 @@ if uploaded_file is not None:
             # Sum the new category columns to get the total height of the tallest bar
             y_max = final_data[category_cols].sum(axis=1).max()
 
-        # Define the fixed vertical offset for single bar labels
-        vertical_offset = y_max * 0.005 # A very small percentage for 'just slightly above the bottom'
+        # Define the fixed vertical offset for bar labels - slightly above the bottom
+        vertical_offset = y_max * 0.015  # Slightly increased for better visibility
         
         # Determine if we have categories or not
         if category_column != 'None':
@@ -293,8 +293,8 @@ if uploaded_file is not None:
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
                             
-        # Increased pad value to push year labels further down from the bars
-        chart_ax1.tick_params(axis='x', bottom=False, length=0, pad=10)
+        # Pad value to position year labels slightly closer to the bars
+        chart_ax1.tick_params(axis='x', bottom=False, length=0, pad=6)
         
         # Remove spines
         chart_ax1.spines['top'].set_visible(False)
@@ -332,9 +332,9 @@ if uploaded_file is not None:
                 # Determine text color based on position
                 text_color = '#000000'  # Default for labels above (on white background)
                 
-                # Calculate base offset - back to original size
+                # Calculate base offset - even closer to the dot
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
-                base_offset = y_range * 0.03  # Back to original small offset
+                base_offset = y_range * 0.015  # Very small offset for tight spacing
                 
                 # Check for potential overlap with bar labels when placing below
                 if place_below and category_column != 'None':
@@ -372,8 +372,8 @@ if uploaded_file is not None:
                         danger_zone = y_range * 0.12  # Labels should be at least this far apart
                         if abs(label_position - bar_label_position_line_scale) < danger_zone:
                             needs_extra_offset = True
-                            # Increase offset to avoid collision, but not too much
-                            base_offset = y_range * 0.08
+                            # Increase offset to avoid collision
+                            base_offset = y_range * 0.06
                             break
                         
                         # Determine segment color for contrast
