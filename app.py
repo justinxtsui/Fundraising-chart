@@ -16,7 +16,8 @@ ALT_VALUE_COLUMN = 'Amount received (converted to GBP)'
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
 # Define the default single bar color (third color in the palette for a lighter tone)
-SINGLE_BAR_COLOR = '#BBBAF6'
+# UPDATED: Reverted to use CATEGORY_COLORS[2] (#D0CCE5) for the light violet default
+SINGLE_BAR_COLOR = CATEGORY_COLORS[2] 
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
