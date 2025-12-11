@@ -209,7 +209,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
         base_offset = y_range * 0.025 
         
-        # --- REFINED PEAK/VALLEY/SLOPE PLACEMENT LOGIC ---
+        # --- FINALIZED PEAK/VALLEY/SLOPE PLACEMENT LOGIC ---
         num_points = len(line_data)
         
         for i, y in enumerate(line_data):
@@ -219,53 +219,43 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
             place_above = False
             
             if num_points > 1:
-                is_peak = False
-                is_valley = False
+                # Get neighbors safely (using y-1 for comparison safety)
+                y_prev = line_data[i-1] if i > 0 else y - 1 
+                y_next = line_data[i+1] if i < num_points - 1 else y - 1
                 
-                # Get neighbors safely
-                y_prev = line_data[i-1] if i > 0 else y - 1 # Artificially lower if no previous
-                y_next = line_data[i+1] if i < num_points - 1 else y - 1 # Artificially lower if no next
-
-                # Check Local Peak: higher than BOTH neighbors
-                if (y > y_prev) and (y > y_next):
-                    is_peak = True
+                # Check Local Peak: higher than or equal to both neighbors
+                is_peak = (y >= y_prev) and (y >= y_next)
                 
-                # Check Local Valley: lower than BOTH neighbors
-                if (y < y_prev) and (y < y_next):
-                    is_valley = True
+                # Check Local Valley: lower than or equal to both neighbors
+                is_valley = (y <= y_prev) and (y <= y_next)
 
                 # --- Decision ---
-                if is_valley:
-                    # Low point (like 89): Place ABOVE the dot.
-                    place_above = True
-                elif is_peak:
-                    # High point (like 214): Place BELOW the dot.
+                if is_peak:
+                    # High point (like 214): Place BELOW the dot (Away from the top margin/header).
                     place_above = False 
-                elif i < num_points - 1:
-                    # Monotonic/Sloped point (like 139, 142, 131)
-                    y_next = line_data[i+1]
-                    if y_next > y:
-                        # RISING slope (e.g., 139 to 142): Place label BELOW (away from ascending line)
-                        place_above = False 
-                    elif y_next < y:
-                        # FALLING slope (e.g., 151 to 89): Place label ABOVE (away from descending line)
-                        place_above = True
-                    else:
-                        # Flat slope: Alternate or follow incoming slope. Default to ABOVE.
-                        place_above = True
+                elif is_valley:
+                    # Low point (like 89): Place ABOVE the dot (Away from the bottom/bar chart).
+                    place_above = True
                 else:
-                    # Last point, not a peak/valley: Follow incoming slope
-                    y_prev = line_data[i-1]
-                    if y > y_prev:
-                        # Last segment was RISING: Place BELOW
-                        place_above = False
-                    elif y < y_prev:
-                        # Last segment was FALLING: Place ABOVE
-                        place_above = True
-                    else:
-                        # Last segment was FLAT: Default to ABOVE
-                        place_above = True
-            
+                    # Monotonic/Sloped point (Tiebreaker)
+                    # If line is falling (pull label above), if rising (pull label below)
+                    if i < num_points - 1:
+                        if y_next > y:
+                            # RISING slope: Place label BELOW (away from ascending line)
+                            place_above = False 
+                        elif y_next < y:
+                            # FALLING slope: Place label ABOVE (away from descending line)
+                            place_above = True
+                        else:
+                            # Flat slope: Use incoming slope or default
+                            place_above = (y < y_prev) or (i == 0) # If falling in or start, go above
+                    elif i == num_points - 1:
+                        # Last point: Use incoming slope
+                        if y > y_prev: # Rising segment came in
+                            place_above = False # Place BELOW
+                        else: # Falling or Flat segment came in
+                            place_above = True # Place ABOVE
+
             # Determine final vertical alignment and position
             if place_above:
                 # Place ABOVE the dot (va='bottom', text sits on top of y_pos)
