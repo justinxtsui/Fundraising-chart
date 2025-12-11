@@ -52,7 +52,7 @@ if uploaded_file is not None:
         show_bars = st.checkbox("Show Bars", value=True)
     
     with col5:
-        show_line = st.checkbox("Show Line (Row Count)", value=True)
+        show_line = st.checkbox("Show Line (Number of deals)", value=True)
     
     # Generate chart button
     if st.button("Generate Chart", type="primary"):
@@ -179,14 +179,14 @@ if uploaded_file is not None:
                             # Use light grey text for dark colors, black for light colors
                             text_color = '#D3D3D3' if idx % 2 == 1 else 'black'
                             chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
-                                    fontsize=12, fontfamily='Public Sans', fontweight='bold', color=text_color)
+                                    fontsize=12, fontfamily='Public Sans', fontweight='semibold', color=text_color)
                     
                     bottom += final_data[cat].values
         else:
             # Single bar without categories (use light purple as default)
             if show_bars:
                 chart_ax1.bar(x_pos, final_data[value_column], bar_width, 
-                       label=value_column, color='#EDD9E4', alpha=1.0)
+                       label='Amount raised', color='#EDD9E4', alpha=1.0)
                 
                 # Add labels to bars
                 baseline_position = final_data[value_column].iloc[0] * 0.05 if len(final_data) > 0 else 0
@@ -195,7 +195,7 @@ if uploaded_file is not None:
                     if val > 0:
                         label_text = format_currency(val)
                         chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
-                                fontsize=12, fontfamily='Public Sans', fontweight='bold', color='black')
+                                fontsize=12, fontfamily='Public Sans', fontweight='semibold', color='black')
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
@@ -215,7 +215,7 @@ if uploaded_file is not None:
         if show_line:
             chart_ax2 = chart_ax1.twinx()
             chart_ax2.plot(x_pos, final_data['row_count'], color='black', 
-                    marker='o', linewidth=1.5, markersize=5, label='Row Count')
+                    marker='o', linewidth=1.5, markersize=5, label='Number of deals')
             chart_ax2.tick_params(axis='y', labelsize=10, right=False, labelright=False, 
                            left=False, labelleft=False, length=0)
             chart_ax2.set_ylim(0, final_data['row_count'].max() * 1.5)
@@ -240,10 +240,10 @@ if uploaded_file is not None:
                 
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=12, 
-                            fontfamily='Public Sans', color=text_color, fontweight='bold')
+                            fontfamily='Public Sans', color=text_color, fontweight='semibold')
                 else:
                     chart_ax2.text(x, y + offset, str(y), ha='center', va='bottom', fontsize=12, 
-                            fontfamily='Public Sans', color=text_color, fontweight='bold')
+                            fontfamily='Public Sans', color=text_color, fontweight='semibold')
             
             # Remove spines for second axis
             chart_ax2.spines['top'].set_visible(False)
@@ -263,11 +263,11 @@ if uploaded_file is not None:
                            markerfacecolor=color, markersize=10, label=cat))
             else:
                 legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                           markerfacecolor='#EDD9E4', markersize=10, label=value_column))
+                           markerfacecolor='#EDD9E4', markersize=10, label='Amount raised'))
         
         if show_line:
             legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                           markerfacecolor='black', markersize=10, label='Row Count'))
+                           markerfacecolor='black', markersize=10, label='Number of deals'))
         
         chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
                   prop={'family': 'Public Sans'}, labelspacing=1.2)
