@@ -194,7 +194,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     # --- AXIS 2 (Line Chart - Count) ---
     if show_line:
         chart_ax2 = chart_ax1.twinx()
-        line_data = final_data['row_count']
+        line_data = final_data['row_count'].values
         max_count = line_data.max()
         
         chart_ax2.plot(x_pos, line_data, color=LINE_COLOR, marker='o', linewidth=1.5, markersize=6, label='Number of Deals')
@@ -207,53 +207,67 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
         base_offset = y_range * 0.025 
         
-        # --- SLOPE-BASED LINE LABEL PLACEMENT LOGIC ---
-        for i, (x, y) in enumerate(zip(x_pos, line_data)):
+        # --- ROBUST PEAK/VALLEY PLACEMENT LOGIC ---
+        num_points = len(line_data)
+        
+        for i, y in enumerate(line_data):
+            x = x_pos[i]
             
-            # Default placement for the last point or single point (use the rising direction: above)
-            va = 'bottom'
-            y_pos = y + base_offset
+            # Default placement is ABOVE (va='bottom') for general readability
+            place_below = False
             
-            if len(line_data) > 1:
-                if i < len(line_data) - 1:
-                    # Logic for all points except the last one: check the *next* segment
-                    y_next = line_data.iloc[i+1]
-                    
-                    if y_next > y:
-                        # RISING slope: Place label BELOW (away from the rising line)
-                        va = 'top' 
-                        y_pos = y - base_offset
-                    elif y_next < y:
-                        # FALLING slope: Place label ABOVE (away from the falling line)
-                        va = 'bottom' 
-                        y_pos = y + base_offset
-                    else:
-                        # FLAT slope: Default to ABOVE (or follow incoming slope if available)
-                        if i > 0 and line_data.iloc[i-1] > y:
-                            # If incoming slope was falling, place BELOW
-                            va = 'top'
-                            y_pos = y - base_offset
-                        else:
-                            # Default to ABOVE
-                            va = 'bottom'
-                            y_pos = y + base_offset
-                else:
-                    # Logic for the LAST point: check the *previous* segment
-                    y_prev = line_data.iloc[i-1]
-                    
-                    if y > y_prev:
-                        # Last segment was RISING: Place label BELOW
-                        va = 'top'
-                        y_pos = y - base_offset
-                    elif y < y_prev:
-                        # Last segment was FALLING: Place label ABOVE
-                        va = 'bottom'
-                        y_pos = y + base_offset
-                    else:
-                        # Last segment was FLAT: Default to ABOVE
-                        va = 'bottom'
-                        y_pos = y + base_offset
+            if num_points > 1:
+                is_peak = False
+                is_valley = False
 
+                # 1. PEAK check: Greater than or equal to both neighbors
+                if i > 0 and i < num_points - 1:
+                    if y >= line_data[i-1] and y >= line_data[i+1]:
+                        is_peak = True
+                # Endpoints that are peaks relative to their single neighbor
+                elif i == 0 and y >= line_data[1]:
+                    is_peak = True
+                elif i == num_points - 1 and y >= line_data[i-1]:
+                    is_peak = True
+
+                # 2. VALLEY check: Less than or equal to both neighbors
+                if i > 0 and i < num_points - 1:
+                    if y <= line_data[i-1] and y <= line_data[i+1]:
+                        is_valley = True
+                # Endpoints that are valleys relative to their single neighbor
+                elif i == 0 and y <= line_data[1]:
+                    is_valley = True
+                elif i == num_points - 1 and y <= line_data[i-1]:
+                    is_valley = True
+                
+                # --- Decision ---
+                if is_peak:
+                    # Point is a high point (like 214): Place BELOW to avoid line/title conflict
+                    place_below = True
+                elif is_valley:
+                    # Point is a low point (like 89): Place ABOVE to avoid line/bar conflict
+                    place_below = False # Keeps the default 'above' placement
+                elif i < num_points - 1:
+                    # Monotonic rising/falling points (not peak/valley): Follow the slope
+                    y_next = line_data[i+1]
+                    if y_next > y:
+                        # RISING slope: Place label BELOW (away from the ascending line)
+                        place_below = True
+                    # If y_next <= y (falling or flat), keep default (ABOVE)
+                else:
+                    # Last point, and not a peak: Place ABOVE (default)
+                    place_below = False
+
+
+            # Determine final vertical alignment and position
+            if place_below:
+                # Place BELOW the dot (va='top', text hangs below y_pos)
+                va = 'top' 
+                y_pos = y - base_offset
+            else:
+                # Place ABOVE the dot (va='bottom', text sits on top of y_pos)
+                va = 'bottom'
+                y_pos = y + base_offset
             
             chart_ax2.text(x, y_pos, str(int(y)), ha='center', va=va, fontsize=dynamic_font_size, 
                            color=LINE_COLOR, fontweight='bold')
