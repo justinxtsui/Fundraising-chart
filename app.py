@@ -213,8 +213,8 @@ if uploaded_file is not None:
             # Sum the new category columns to get the total height of the tallest bar
             y_max = final_data[category_cols].sum(axis=1).max()
 
-        # Define the fixed vertical offset for bar labels - slightly above the bottom
-        vertical_offset = y_max * 0.015  # Slightly increased for better visibility
+        # Define the fixed vertical offset for bar labels - close to the bottom
+        vertical_offset = y_max * 0.008  # Very close to the base
         
         # Determine if we have categories or not
         if category_column != 'None':
