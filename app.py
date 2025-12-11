@@ -210,37 +210,49 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         # --- SLOPE-BASED LINE LABEL PLACEMENT LOGIC ---
         for i, (x, y) in enumerate(zip(x_pos, line_data)):
             
-            # Default placement is based on the *next* segment's slope
+            # Default placement for the last point or single point (use the rising direction: above)
+            va = 'bottom'
+            y_pos = y + base_offset
             
-            if i < len(line_data) - 1:
-                y_next = line_data.iloc[i+1]
-                
-                if y_next >= y:
-                    # Rising or Flat slope: Place label ABOVE the current dot
-                    va = 'bottom' # Text sits on top of y_pos
-                    y_pos = y + base_offset
-                else:
-                    # Falling slope: Place label BELOW the current dot
-                    va = 'top' # Text hangs below y_pos
-                    y_pos = y - base_offset
-            else:
-                # Last point: No next segment to determine slope.
-                # Use the slope of the *previous* segment for consistency.
-                if i > 0:
-                    y_prev = line_data.iloc[i-1]
+            if len(line_data) > 1:
+                if i < len(line_data) - 1:
+                    # Logic for all points except the last one: check the *next* segment
+                    y_next = line_data.iloc[i+1]
                     
-                    if y >= y_prev:
-                        # Rising or Flat segment coming in: Place label ABOVE
+                    if y_next > y:
+                        # RISING slope: Place label BELOW (away from the rising line)
+                        va = 'top' 
+                        y_pos = y - base_offset
+                    elif y_next < y:
+                        # FALLING slope: Place label ABOVE (away from the falling line)
                         va = 'bottom' 
                         y_pos = y + base_offset
                     else:
-                        # Falling segment coming in: Place label BELOW
-                        va = 'top' 
-                        y_pos = y - base_offset
+                        # FLAT slope: Default to ABOVE (or follow incoming slope if available)
+                        if i > 0 and line_data.iloc[i-1] > y:
+                            # If incoming slope was falling, place BELOW
+                            va = 'top'
+                            y_pos = y - base_offset
+                        else:
+                            # Default to ABOVE
+                            va = 'bottom'
+                            y_pos = y + base_offset
                 else:
-                    # Only one point: Default to ABOVE
-                    va = 'bottom'
-                    y_pos = y + base_offset
+                    # Logic for the LAST point: check the *previous* segment
+                    y_prev = line_data.iloc[i-1]
+                    
+                    if y > y_prev:
+                        # Last segment was RISING: Place label BELOW
+                        va = 'top'
+                        y_pos = y - base_offset
+                    elif y < y_prev:
+                        # Last segment was FALLING: Place label ABOVE
+                        va = 'bottom'
+                        y_pos = y + base_offset
+                    else:
+                        # Last segment was FLAT: Default to ABOVE
+                        va = 'bottom'
+                        y_pos = y + base_offset
 
             
             chart_ax2.text(x, y_pos, str(int(y)), ha='center', va=va, fontsize=dynamic_font_size, 
