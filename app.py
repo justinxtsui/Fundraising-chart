@@ -13,8 +13,8 @@ VALUE_COLUMN = 'Amount received (converted to GBP)'
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
 # Define the default single bar color (third color in the palette for a lighter tone)
-# UPDATED: Changed SINGLE_BAR_COLOR to #8C8AED
-SINGLE_BAR_COLOR = '#8C8AED'
+# UPDATED: Changed SINGLE_BAR_COLOR to #BBBAF6
+SINGLE_BAR_COLOR = '#BBBAF6'
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
@@ -218,7 +218,6 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
             for i, x in enumerate(x_pos):
                 val = final_data[VALUE_COLUMN].iloc[i]
                 if val > 0:
-                    label_text = format_currency(val)
                     text_color = '#FFFFFF' if is_dark_color(SINGLE_BAR_COLOR) else '#000000'
 
                     # Vertical positioning logic (near the base):
