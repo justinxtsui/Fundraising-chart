@@ -351,12 +351,12 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         else:
             # UPDATED LEGEND LABEL
             legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=10, label='Total amount received'))
+                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=20, label='Total amount received'))
             
     if show_line:
         # UPDATED LEGEND LABEL
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                      markerfacecolor=LINE_COLOR, markersize=10, label='Number of deals'))
+                                      markerfacecolor=LINE_COLOR, markersize=20, label='Number of deals'))
         
     # **FINAL CHANGE:** Legend fontsize changed to 30
     chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=30, frameon=False, 
