@@ -176,7 +176,7 @@ if uploaded_file is not None:
         # Create the chart
         chart_fig, chart_ax1 = plt.subplots(figsize=(10, 8))
         
-        # MODIFIED: Increased bar width from 0.6 to 0.8
+        # MODIFIED: Increased bar width to 0.8
         bar_width = 0.8
         x_pos = np.arange(len(final_data))
         
@@ -202,7 +202,7 @@ if uploaded_file is not None:
             y_max = final_data[category_cols].sum(axis=1).max()
 
         # Define the fixed vertical offset for single bar labels
-        vertical_offset = y_max * 0.005 # A very small percentage for 'just slightly above the bottom'
+        vertical_offset = y_max * 0.005 
         
         # Determine if we have categories or not
         if category_column != 'None':
@@ -268,7 +268,7 @@ if uploaded_file is not None:
         chart_ax1.tick_params(axis='y', labelsize=10, left=False, labelleft=False, 
                             right=False, labelright=False, length=0)
                             
-        # MODIFIED: Increased pad value to push year labels further down from the bars
+        # Increased pad value to push year labels further down from the bars
         chart_ax1.tick_params(axis='x', labelsize=12, bottom=False, length=0, pad=10)
         
         # Remove spines
@@ -351,6 +351,7 @@ if uploaded_file is not None:
         chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
                     prop={'family': 'Public Sans', 'weight': 'normal'}, labelspacing=1.2)
         
+        # Title uses fontweight=600 (Semi Bold)
         plt.title('Data Visualization', fontsize=14, fontweight=600, pad=20, fontfamily='Public Sans')
         plt.tight_layout()
         
