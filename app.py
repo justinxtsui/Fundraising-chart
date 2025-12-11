@@ -195,7 +195,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         if show_bars:
             # Bar chart label is used in the legend
             chart_ax1.bar(x_pos, final_data[VALUE_COLUMN], bar_width, 
-                          label='Total amount received', color=SINGLE_BAR_COLOR, alpha=1.0) # UPDATED LABEL
+                          label='Total amount received', color=SINGLE_BAR_COLOR, alpha=1.0) 
         
             for i, x in enumerate(x_pos):
                 val = final_data[VALUE_COLUMN].iloc[i]
@@ -229,8 +229,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         chart_ax2 = chart_ax1.twinx()
         line_data = final_data['row_count'].values
         
-        # Line chart label is used in the legend
-        chart_ax2.plot(x_pos, line_data, color=LINE_COLOR, marker='o', linewidth=1.5, markersize=6, label='Number of Deals') # UPDATED LABEL
+        # Line chart label is used in the legend - CHANGED: 'deals' is lowercase
+        chart_ax2.plot(x_pos, line_data, color=LINE_COLOR, marker='o', linewidth=1.5, markersize=6, label='Number of deals') 
         
         # Calculate max_count after plotting to get accurate current limits
         max_count = line_data.max()
@@ -324,7 +324,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     if show_line:
         # UPDATED LEGEND LABEL
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
-                                      markerfacecolor=LINE_COLOR, markersize=10, label='Number of Deals'))
+                                      markerfacecolor=LINE_COLOR, markersize=10, label='Number of deals'))
         
     chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=12, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
