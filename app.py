@@ -344,7 +344,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
                                       markerfacecolor=LINE_COLOR, markersize=10, label='Number of deals'))
         
-    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=12, frameon=False, 
+    # UPDATED: Legend fontsize changed to 18
+    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
     # Matplotlib Chart Title: Color is TITLE_COLOR (Black)
