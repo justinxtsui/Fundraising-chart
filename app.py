@@ -176,7 +176,7 @@ if uploaded_file is not None:
         # Create the chart
         chart_fig, chart_ax1 = plt.subplots(figsize=(10, 8))
         
-        # Increased bar width to 0.8
+        # Bar width 0.8
         bar_width = 0.8
         x_pos = np.arange(len(final_data))
         
@@ -231,9 +231,9 @@ if uploaded_file is not None:
                             else:
                                 text_color = 'black'
                                 
-                            # Font family confirmed as 'Public Sans'
+                            # MODIFIED: Changed fontweight to 600 (Semi Bold)
                             chart_ax1.text(x, y_pos, label_text, ha='center', va='center',
-                                    fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color=text_color)
+                                    fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color=text_color)
                     
                     bottom += final_data[cat].values
         else:
@@ -250,9 +250,9 @@ if uploaded_file is not None:
                     if val > 0:
                         label_text = format_currency(val)
                         # Alignment is ha='center' 
-                        # Font family confirmed as 'Public Sans'
+                        # MODIFIED: Changed fontweight to 600 (Semi Bold)
                         chart_ax1.text(x, baseline_position, label_text, ha='center', va='bottom',
-                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight='normal', color='black')
+                                fontsize=dynamic_font_size, fontfamily='Public Sans', fontweight=600, color='black')
         
         # Set up x-axis
         chart_ax1.set_xticks(x_pos)
@@ -260,7 +260,7 @@ if uploaded_file is not None:
         # Ensure year labels use dynamic font size
         chart_ax1.set_xticklabels(final_data['time_period'])
         
-        # Set font properties for X-axis ticks (Year) - Family confirmed as 'Public Sans'
+        # Set font properties for X-axis ticks (Year)
         plt.setp(chart_ax1.get_xticklabels(),
                  fontsize=dynamic_font_size, # Ensures size matches the values/numbers
                  fontfamily='Public Sans',
@@ -316,13 +316,13 @@ if uploaded_file is not None:
                 y_range = chart_ax2.get_ylim()[1] - chart_ax2.get_ylim()[0]
                 offset = y_range * 0.02
                 
-                # Font family confirmed as 'Public Sans'
+                # MODIFIED: Changed fontweight to 600 (Semi Bold)
                 if place_below:
                     chart_ax2.text(x, y - offset, str(y), ha='center', va='top', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight='normal')
+                            fontfamily='Public Sans', color=text_color, fontweight=600)
                 else:
                     chart_ax2.text(x, y + offset, str(y), ha='center', va='bottom', fontsize=dynamic_font_size, 
-                            fontfamily='Public Sans', color=text_color, fontweight='normal')
+                            fontfamily='Public Sans', color=text_color, fontweight=600)
             
             # Remove spines for second axis
             chart_ax2.spines['top'].set_visible(False)
@@ -352,7 +352,7 @@ if uploaded_file is not None:
         chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
                     prop={'family': 'Public Sans', 'weight': 'normal'}, labelspacing=1.2)
         
-        # Title uses fontweight=600 (Semi Bold) and fontfamily='Public Sans'
+        # Title uses fontweight=600 (Semi Bold)
         plt.title('Data Visualization', fontsize=14, fontweight=600, pad=20, fontfamily='Public Sans')
         plt.tight_layout()
         
