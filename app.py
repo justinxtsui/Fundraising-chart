@@ -344,7 +344,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     legend_elements = []
     
     # Define large font size for legend
-    LEGEND_FONT_SIZE = 260  # Increased font size for better readability
+    LEGEND_FONT_SIZE = 18  # Legend font size
     # Keep marker size fixed at 16 points
     LEGEND_MARKER_SIZE = 16
     
