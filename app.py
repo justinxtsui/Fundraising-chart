@@ -15,6 +15,26 @@ ALT_DATE_COLUMN = 'Date the participant received the grant'
 ALT_VALUE_COLUMN = 'Amount received (converted to GBP)'
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
+
+# Expanded predefined color palette for user selection (purple/lavender family)
+PREDEFINED_COLORS = {
+    'Dark Purple': '#302A7E',
+    'Medium Purple': '#5C5799',
+    'Light Purple': '#8884B3',
+    'Soft Lavender': '#B4B1CE',
+    'Pale Lavender': '#D0CCE5',
+    'Very Light Lavender': '#E0DEE9',
+    'Deep Indigo': '#4A3B8C',
+    'Royal Purple': '#6B5CA5',
+    'Periwinkle': '#9B8EC7',
+    'Lilac': '#C5B8E0',
+    'Lavender Mist': '#E6E0F2',
+    'Violet': '#8A2BE2',
+    'Amethyst': '#9966CC',
+    'Mauve': '#BFA0D8',
+    'Thistle': '#D8BFD8',
+    'Plum': '#DDA0DD'
+}
 # Define the default single bar color (third color in the palette for a lighter tone)
 SINGLE_BAR_COLOR = '#BBBAF6'
 # Define the line chart color
@@ -555,18 +575,47 @@ with st.sidebar:
                 if 'category_colors' not in st.session_state:
                     st.session_state['category_colors'] = {}
                 
-                # Create color pickers for each category
+                # Create color selectors for each category
+                color_names = list(PREDEFINED_COLORS.keys())
+                
                 for idx, category in enumerate(unique_categories):
                     # Use default color if not set
                     default_color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
                     current_color = st.session_state['category_colors'].get(category, default_color)
                     
-                    selected_color = st.color_picker(
-                        f"Color for '{category}'",
-                        value=current_color,
-                        key=f'color_picker_{category}'
-                    )
-                    st.session_state['category_colors'][category] = selected_color
+                    # Find the current color name, or use first as default
+                    current_color_name = None
+                    for name, hex_code in PREDEFINED_COLORS.items():
+                        if hex_code == current_color:
+                            current_color_name = name
+                            break
+                    
+                    if current_color_name is None:
+                        current_color_name = color_names[idx % len(color_names)]
+                    
+                    # Create columns for color preview and selector
+                    col1, col2 = st.columns([1, 3])
+                    
+                    with col1:
+                        # Show color preview
+                        selected_name = st.selectbox(
+                            f"'{category}'",
+                            options=color_names,
+                            index=color_names.index(current_color_name) if current_color_name in color_names else 0,
+                            key=f'color_selector_{category}',
+                            label_visibility='collapsed'
+                        )
+                    
+                    with col2:
+                        # Display color swatch preview
+                        selected_hex = PREDEFINED_COLORS[selected_name]
+                        st.markdown(
+                            f'<div style="background-color: {selected_hex}; padding: 10px; border-radius: 5px; text-align: center; color: {"white" if is_dark_color(selected_hex) else "black"};">'
+                            f'<b>{category}</b> - {selected_name}</div>',
+                            unsafe_allow_html=True
+                        )
+                    
+                    st.session_state['category_colors'][category] = PREDEFINED_COLORS[selected_name]
         else:
             st.session_state['category_column'] = 'None'
             st.session_state['category_colors'] = {}
