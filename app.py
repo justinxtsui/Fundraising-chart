@@ -16,6 +16,8 @@ CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DE
 SINGLE_BAR_COLOR = CATEGORY_COLORS[2] 
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
+# Default Title
+DEFAULT_TITLE = 'Grant Funding and Deal Count Over Time'
 
 # Set page config and general styles
 st.set_page_config(page_title="Dynamic Grant Chart Generator", layout="wide")
@@ -119,7 +121,7 @@ def process_data(df, year_range, category_column):
     return final_data, None
 
 
-def generate_chart(final_data, category_column, show_bars, show_line):
+def generate_chart(final_data, category_column, show_bars, show_line, chart_title):
     """Generates the dual-axis Matplotlib chart."""
     chart_fig, chart_ax1 = plt.subplots(figsize=(12, 6))
     
@@ -233,7 +235,8 @@ def generate_chart(final_data, category_column, show_bars, show_line):
     chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=12, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
-    plt.title('Data Visualization', fontsize=18, fontweight='bold', pad=20)
+    # Use the custom title here
+    plt.title(chart_title, fontsize=18, fontweight='bold', pad=20)
     plt.tight_layout()
     
     return chart_fig
@@ -244,13 +247,12 @@ st.title("📊 Dynamic Grant Funding Chart Generator")
 st.markdown("---")
 
 # Initialize buffers and session state
-buf_png = BytesIO()
-buf_svg = BytesIO()
 if 'year_range' not in st.session_state:
     st.session_state['year_range'] = (1900, 2100)
     st.session_state['category_column'] = 'None'
     st.session_state['show_bars'] = True
     st.session_state['show_line'] = True
+    st.session_state['chart_title'] = DEFAULT_TITLE
     st.session_state['buf_png'] = BytesIO()
     st.session_state['buf_svg'] = BytesIO()
 
@@ -272,22 +274,28 @@ with st.sidebar:
         st.markdown("---")
         st.header("2. Configure Visualization")
         
-        # --- New Year Selection (Start/End Select Boxes) ---
+        # --- Chart Title Input ---
+        custom_title = st.text_input(
+            "Chart Title", 
+            value=st.session_state.get('chart_title', DEFAULT_TITLE),
+            key='chart_title_input'
+        )
+        st.session_state['chart_title'] = custom_title
+        st.markdown("---")
+        
+        # --- Year Selection (Start/End Select Boxes) ---
         min_year = int(df[DATE_COLUMN].dt.year.min())
         max_year = int(df[DATE_COLUMN].dt.year.max())
         all_years = list(range(min_year, max_year + 1))
         
-        # Determine initial selection defaults
         default_start = min_year
         default_end = max_year
         
-        # Retrieve or set current session state values
         current_start, current_end = st.session_state.get('year_range', (default_start, default_end))
         
         col_start, col_end = st.columns(2)
         
         with col_start:
-            # Set the index based on the current session state value
             start_year = st.selectbox(
                 "Select Start Year",
                 options=all_years,
@@ -296,7 +304,6 @@ with st.sidebar:
             )
             
         with col_end:
-            # Set the index based on the current session state value
             end_year = st.selectbox(
                 "Select End Year",
                 options=all_years,
@@ -304,7 +311,6 @@ with st.sidebar:
                 key='end_year_selector'
             )
             
-        # Validate selection
         if start_year > end_year:
             st.error("Start Year must be less than or equal to End Year.")
             st.stop()
@@ -350,7 +356,7 @@ with st.sidebar:
         st.download_button(
             label="Download Chart as **PNG** 🖼️",
             data=st.session_state.get('buf_png', BytesIO()),
-            file_name="grant_funding_chart.png",
+            file_name=f"{custom_title.replace(' ', '_').lower()}_chart.png",
             mime="image/png",
             key="download_png",
             use_container_width=True
@@ -358,7 +364,7 @@ with st.sidebar:
         st.download_button(
             label="Download Chart as **SVG** 📐",
             data=st.session_state.get('buf_svg', BytesIO()),
-            file_name="grant_funding_chart.svg",
+            file_name=f"{custom_title.replace(' ', '_').lower()}_chart.svg",
             mime="image/svg+xml",
             key="download_svg",
             use_container_width=True
@@ -374,6 +380,7 @@ if df is not None:
     category_column = st.session_state['category_column']
     show_bars = st.session_state['show_bars']
     show_line = st.session_state['show_line']
+    chart_title = st.session_state['chart_title']
     
     # Process the data
     final_data, process_error = process_data(df, year_range, category_column)
@@ -382,8 +389,8 @@ if df is not None:
         st.error(process_error)
         st.stop()
     
-    # Generate the chart
-    chart_fig = generate_chart(final_data, category_column, show_bars, show_line)
+    # Generate the chart, passing the custom title
+    chart_fig = generate_chart(final_data, category_column, show_bars, show_line, chart_title)
 
     st.pyplot(chart_fig, use_container_width=True)
     
