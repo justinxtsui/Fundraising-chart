@@ -13,7 +13,8 @@ VALUE_COLUMN = 'Amount received (converted to GBP)'
 # Define the color palette for categories
 CATEGORY_COLORS = ['#302A7E', '#8884B3', '#D0CCE5', '#5C5799', '#B4B1CE', '#E0DEE9']
 # Define the default single bar color (third color in the palette for a lighter tone)
-SINGLE_BAR_COLOR = CATEGORY_COLORS[2]
+# UPDATED: Changed SINGLE_BAR_COLOR to #8C8AED
+SINGLE_BAR_COLOR = '#8C8AED'
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
@@ -379,7 +380,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("Upload your Excel or CSV file", type=['xlsx', 'xls', 'csv'], 
                                      help="The file must contain a date column and a value column.")
 
-    # Initialize df_base to None outside the conditional block
+    # Initialize df_base to None
     df_base = None 
     
     if uploaded_file:
