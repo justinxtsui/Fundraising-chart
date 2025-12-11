@@ -361,8 +361,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         legend_elements.append(Line2D([0], [0], marker='o', color='w', 
                                       markerfacecolor=LINE_COLOR, markersize=10, label='Number of deals'))
         
-    # UPDATED: Legend fontsize changed to 18
-    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=18, frameon=False, 
+    # **MAJOR CHANGE:** Legend fontsize changed to 25
+    chart_ax1.legend(handles=legend_elements, loc='upper left', fontsize=25, frameon=False, 
                      prop={'weight': 'normal'}, labelspacing=1.0)
     
     # Matplotlib Chart Title: Color is TITLE_COLOR (Black)
@@ -634,13 +634,4 @@ else:
     This generator creates professional time series charts visualizing value (bars) and count (line) over time.
 
     1.  **Upload:** Provide your data file in the sidebar.
-    2.  **Configure:** Use the controls under **'2. Chart Configuration'** to filter the time range, choose a category for stacking, and set the title.
-    3.  **Filter:** Use **'3. Data Filter'** to include or exclude specific data points based on column values.
-    4.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 4 of the sidebar.
-    """)
-
-    st.markdown("---")
-    st.subheader("Expected Data Format")
-    st.markdown(f"""
-    Your file must contain, at minimum, a date column (either **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**) and a value column (either **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**).
-    """)
+    2.  **Configure:** Use the controls under **'2. Chart Configuration
