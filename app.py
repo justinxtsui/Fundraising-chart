@@ -565,7 +565,6 @@ with st.sidebar:
             # Color picker for each category  
             if category_column != 'None':
                 st.subheader("Category Order & Colors")
-                st.caption("Drag categories to reorder | Click color squares to change")
                 
                 # Enhanced CSS for modern, clean design
                 st.markdown("""
@@ -617,9 +616,8 @@ with st.sidebar:
                         default_color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
                         st.session_state['category_colors'][category] = default_color
                 
-                # Simple, clean drag section
-                st.markdown("##### 🔄 Drag to Reorder")
-                st.info("Top category = top of chart stack", icon="ℹ️")
+                # Drag section
+                st.markdown("**Drag to Reorder**")
                 
                 # Simple drag interface
                 sorted_categories = sort_items(
@@ -638,50 +636,48 @@ with st.sidebar:
                 
                 st.markdown("---")
                 
-                # Beautiful color selection section
-                st.markdown("##### 🎨 Assign Colors")
+                # Color selection section
+                st.markdown("**Assign Colors**")
                 
                 for idx, category in enumerate(sorted_categories):
                     current_color = st.session_state['category_colors'].get(category, CATEGORY_COLORS[idx % len(CATEGORY_COLORS)])
                     
-                    # Category header with gradient background showing current color
-                    text_color = 'white' if is_dark_color(current_color) else '#333'
-                    st.markdown(
-                        f'<div style="background: linear-gradient(135deg, {current_color} 0%, {current_color}ee 100%); '
-                        f'padding: 14px 20px; border-radius: 8px; margin: 20px 0 12px 0; '
-                        f'box-shadow: 0 2px 4px rgba(0,0,0,0.1);">'
-                        f'<strong style="font-size: 16px; color: {text_color};">{category}</strong></div>',
-                        unsafe_allow_html=True
-                    )
+                    # Create two columns: category name and color dropdown
+                    col1, col2 = st.columns([2, 1])
                     
-                    # Color selection - 3 buttons in a row
-                    cols = st.columns(3)
+                    with col1:
+                        # Category name with color indicator
+                        text_color = 'white' if is_dark_color(current_color) else '#333'
+                        st.markdown(
+                            f'<div style="background-color: {current_color}; '
+                            f'padding: 10px 16px; border-radius: 6px; margin-top: 8px;">'
+                            f'<strong style="color: {text_color};">{category}</strong></div>',
+                            unsafe_allow_html=True
+                        )
                     
-                    for col_idx, (color_name, color_hex) in enumerate(PREDEFINED_COLORS.items()):
-                        with cols[col_idx]:
-                            is_selected = (current_color == color_hex)
-                            
-                            # Big, beautiful color square button
-                            if st.button(
-                                "✓ Selected" if is_selected else "Select",
-                                key=f'clr_{category}_{color_name}',
-                                use_container_width=True,
-                                type="primary" if is_selected else "secondary"
-                            ):
-                                st.session_state['category_colors'][category] = color_hex
-                                st.rerun()
-                            
-                            # Large color preview square below
-                            border = "4px solid #000" if is_selected else "2px solid #e0e0e0"
-                            shadow = "0 4px 12px rgba(0,0,0,0.15)" if is_selected else "0 2px 4px rgba(0,0,0,0.08)"
-                            st.markdown(
-                                f'<div style="width: 100%; height: 70px; background-color: {color_hex}; '
-                                f'border-radius: 8px; border: {border}; box-shadow: {shadow}; '
-                                f'margin-top: 8px; transition: all 0.2s ease;"></div>',
-                                unsafe_allow_html=True
-                            )
-                    
-                    st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
+                    with col2:
+                        # Find current color name
+                        current_color_name = None
+                        for name, hex_code in PREDEFINED_COLORS.items():
+                            if hex_code == current_color:
+                                current_color_name = name
+                                break
+                        
+                        if current_color_name is None:
+                            current_color_name = list(PREDEFINED_COLORS.keys())[0]
+                        
+                        color_names = list(PREDEFINED_COLORS.keys())
+                        
+                        # Simple dropdown for color selection
+                        selected_color_name = st.selectbox(
+                            "Color",
+                            options=color_names,
+                            index=color_names.index(current_color_name),
+                            key=f'color_select_{category}',
+                            label_visibility='collapsed'
+                        )
+                        
+                        st.session_state['category_colors'][category] = PREDEFINED_COLORS[selected_color_name]
         else:
             st.session_state['category_column'] = 'None'
             st.session_state['category_colors'] = {}
