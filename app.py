@@ -39,84 +39,42 @@ st.set_page_config(page_title="Time Series Chart Generator", layout="wide", init
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'Public Sans', 'DejaVu Sans']
 
-# Global CSS for professional appearance
+# Minimal LinkedIn-style CSS
 st.markdown("""
     <style>
-    /* Import modern font */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    /* Global styles */
+    /* Clean typography */
     html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     
-    /* Main content area */
+    /* Main content background */
     .main {
-        background-color: #f8f9fa;
+        background-color: #f3f2ef;
     }
     
-    /* Sidebar styling */
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #ffffff;
-        border-right: 1px solid #e0e0e0;
-    }
-    
-    [data-testid="stSidebar"] h2 {
-        color: #302A7E;
-        font-weight: 600;
+        background-color: white;
     }
     
     /* Headers */
     h1, h2, h3 {
         font-weight: 600;
-    }
-    
-    /* Buttons */
-    .stButton > button {
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    /* File uploader */
-    [data-testid="stFileUploader"] {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        border: 2px dashed #d0d0d0;
-    }
-    
-    /* Selectbox and inputs */
-    .stSelectbox, .stTextInput {
-        font-weight: 400;
-    }
-    
-    /* Download buttons */
-    .stDownloadButton > button {
-        background: linear-gradient(135deg, #302A7E 0%, #8884B3 100%);
-        color: white;
-        border: none;
-        font-weight: 500;
+        color: #000;
     }
     
     /* Remove extra padding */
     .block-container {
         padding-top: 2rem;
-        padding-bottom: 2rem;
     }
     
     /* Code blocks */
     code {
-        background-color: #f5f5f5;
+        background-color: #f3f6f8;
         padding: 2px 6px;
-        border-radius: 3px;
+        border-radius: 2px;
         font-size: 0.9em;
-        color: #d63384;
+        color: #333;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -502,31 +460,21 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # 1. MAIN APPLICATION TITLE
 st.markdown("""
-    <div style="background: linear-gradient(135deg, #302A7E 0%, #8884B3 100%); 
-                padding: 30px; 
-                border-radius: 12px; 
-                margin-bottom: 25px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h1 style="color: white; margin: 0 0 10px 0; font-size: 36px;">
-            📊 Time Series Chart Generator
+    <div style="background: white; 
+                padding: 24px 0; 
+                border-bottom: 1px solid #e0e0e0;
+                margin-bottom: 24px;">
+        <h1 style="color: #000; margin: 0 0 8px 0; font-size: 32px; font-weight: 600;">
+            Time Series Chart Generator
         </h1>
-        <p style="color: rgba(255,255,255,0.95); margin: 0; font-size: 16px; font-weight: 400;">
+        <p style="color: #666; margin: 0 0 12px 0; font-size: 15px;">
             Turn any fundraising or grant export into a time series chart – JT
         </p>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
-            <a href="https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119" 
-               target="_blank" 
-               style="color: white; 
-                      background: rgba(255,255,255,0.2); 
-                      padding: 8px 16px; 
-                      border-radius: 6px; 
-                      text-decoration: none; 
-                      font-weight: 500;
-                      display: inline-block;
-                      transition: all 0.3s;">
-               🔗 Beauhurst Advanced Search →
-            </a>
-        </div>
+        <a href="https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119" 
+           target="_blank" 
+           style="color: #0073b1; text-decoration: none; font-size: 14px; font-weight: 500;">
+           Beauhurst Advanced Search →
+        </a>
     </div>
 """, unsafe_allow_html=True)
 
@@ -913,16 +861,14 @@ if 'df_base' in locals() and df_base is not None:
     st.session_state['buf_svg'] = buf_svg
 
 else:
-    # Message for initial load - Professional card style
+    # Message for initial load - Simple style
     st.markdown("""
-        <div style="background: #e3f2fd; 
-                    border-left: 5px solid #2196F3; 
-                    padding: 20px; 
-                    border-radius: 8px;
-                    margin: 20px 0;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <p style="margin: 0; font-size: 16px; color: #1976D2; font-weight: 500;">
-                ⬆️ Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.
+        <div style="background: #f3f6f8; 
+                    padding: 16px; 
+                    border-radius: 4px;
+                    margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #333;">
+                Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -930,16 +876,15 @@ else:
     # Expected Data Format Card
     st.markdown("""
         <div style="background: white; 
-                    padding: 25px; 
-                    border-radius: 10px; 
-                    margin: 25px 0;
-                    border: 1px solid #e0e0e0;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="color: #302A7E; margin: 0 0 15px 0; font-size: 22px; display: flex; align-items: center;">
-                📋 Expected Data Format
+                    padding: 20px; 
+                    border: 1px solid #e0e0e0; 
+                    border-radius: 4px;
+                    margin: 20px 0;">
+            <h3 style="color: #000; margin: 0 0 12px 0; font-size: 18px; font-weight: 600;">
+                Expected Data Format
             </h3>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0;">
-                Your file must contain, at minimum, a date column (either <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 14px;">Deal date</code> or <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 14px;">Date the participant received the grant</code>) and a value column (either <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 14px;">Amount raised (converted to GBP)</code> or <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 14px;">Amount received (converted to GBP)</code>).
+            <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 0;">
+                Your file must contain, at minimum, a date column (either <code style="background: #f3f6f8; padding: 2px 6px; border-radius: 2px; font-size: 13px;">Deal date</code> or <code style="background: #f3f6f8; padding: 2px 6px; border-radius: 2px; font-size: 13px;">Date the participant received the grant</code>) and a value column (either <code style="background: #f3f6f8; padding: 2px 6px; border-radius: 2px; font-size: 13px;">Amount raised (converted to GBP)</code> or <code style="background: #f3f6f8; padding: 2px 6px; border-radius: 2px; font-size: 13px;">Amount received (converted to GBP)</code>).
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -947,26 +892,23 @@ else:
     # How It Works Card
     st.markdown("""
         <div style="background: white; 
-                    padding: 25px; 
-                    border-radius: 10px; 
-                    margin: 25px 0;
-                    border: 1px solid #e0e0e0;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h3 style="color: #302A7E; margin: 0 0 15px 0; font-size: 22px; display: flex; align-items: center;">
-                💡 How It Works
+                    padding: 20px; 
+                    border: 1px solid #e0e0e0; 
+                    border-radius: 4px;
+                    margin: 20px 0;">
+            <h3 style="color: #000; margin: 0 0 12px 0; font-size: 18px; font-weight: 600;">
+                How It Works
             </h3>
-            <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 15px 0;">
+            <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 0 0 16px 0;">
                 This generator creates professional time series charts visualizing value (bars) and count (line) over time.
             </p>
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: #302A7E; font-size: 16px;">1. Upload</strong>
-                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Provide your data file in the sidebar.</p>
+            <div style="color: #666; font-size: 14px; line-height: 1.8;">
+                <div style="margin-bottom: 12px;">
+                    <strong style="color: #000;">1. Upload:</strong> Provide your data file in the sidebar.
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <strong style="color: #302A7E; font-size: 16px;">2. Configure</strong>
-                    <p style="margin: 5px 0 5px 0; color: #666; font-size: 14px;">Use the controls in the sidebar sections to:</p>
-                    <ul style="margin: 5px 0 0 20px; color: #666; font-size: 14px; line-height: 1.8;">
+                <div style="margin-bottom: 12px;">
+                    <strong style="color: #000;">2. Configure:</strong> Use the controls in the sidebar sections to:
+                    <ul style="margin: 8px 0 0 20px;">
                         <li>Set your chart title (Section 2)</li>
                         <li>Filter the time range (Section 3)</li>
                         <li>Choose visual elements (Section 4)</li>
@@ -975,8 +917,7 @@ else:
                     </ul>
                 </div>
                 <div>
-                    <strong style="color: #302A7E; font-size: 16px;">3. View & Download</strong>
-                    <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.</p>
+                    <strong style="color: #000;">3. View & Download:</strong> The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.
                 </div>
             </div>
         </div>
