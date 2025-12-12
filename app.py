@@ -567,6 +567,29 @@ with st.sidebar:
                 st.subheader("Category Order & Colors")
                 st.caption("📦 Drag colored blocks to reorder (top = top of chart)")
                 
+                # Add CSS to style the drag boxes
+                st.markdown("""
+                    <style>
+                    /* Style the sortable items */
+                    .sortable-item {
+                        background-color: #f0f0f0 !important;
+                        border: 2px solid #d0d0d0 !important;
+                        border-radius: 5px !important;
+                        padding: 10px !important;
+                        margin: 5px 0 !important;
+                    }
+                    .sortable-item:hover {
+                        background-color: #e0e0e0 !important;
+                        border-color: #b0b0b0 !important;
+                    }
+                    /* Override any red styling */
+                    .sortable-ghost {
+                        background-color: #d0d0f0 !important;
+                        opacity: 0.5 !important;
+                    }
+                    </style>
+                """, unsafe_allow_html=True)
+                
                 # Get unique categories from the selected column
                 unique_categories = sorted(df_base[category_column].dropna().unique())
                 
@@ -579,8 +602,6 @@ with st.sidebar:
                 # Initialize sorted category list if not exists or if categories changed
                 if 'sorted_categories' not in st.session_state or set(st.session_state.get('sorted_categories', [])) != set(unique_categories):
                     st.session_state['sorted_categories'] = list(reversed(unique_categories))  # Reversed so top = top
-                
-                color_names = list(PREDEFINED_COLORS.keys())
                 
                 # Pre-assign colors before showing drag interface
                 for idx, category in enumerate(st.session_state['sorted_categories']):
@@ -644,28 +665,36 @@ with st.sidebar:
                 with col_color:
                     st.markdown("**Select colors:**")
                     
-                    # Color selectors aligned with categories
+                    # Visual color selectors for each category
                     for idx, category in enumerate(sorted_categories):
                         current_color = st.session_state['category_colors'].get(category, CATEGORY_COLORS[idx % len(CATEGORY_COLORS)])
                         
-                        # Find the current color name
-                        current_color_name = None
-                        for name, hex_code in PREDEFINED_COLORS.items():
-                            if hex_code == current_color:
-                                current_color_name = name
-                                break
+                        st.markdown(f"**{category}:**")
                         
-                        if current_color_name is None:
-                            current_color_name = color_names[0]
+                        # Create clickable color buttons
+                        button_cols = st.columns(3)
                         
-                        selected_name = st.selectbox(
-                            f"{category}",
-                            options=color_names,
-                            index=color_names.index(current_color_name) if current_color_name in color_names else 0,
-                            key=f'color_selector_{category}'
-                        )
-                        
-                        st.session_state['category_colors'][category] = PREDEFINED_COLORS[selected_name]
+                        for col_idx, (color_name, color_hex) in enumerate(PREDEFINED_COLORS.items()):
+                            with button_cols[col_idx]:
+                                # Show if this is the currently selected color
+                                is_selected = (current_color == color_hex)
+                                border_style = "3px solid #000000" if is_selected else "1px solid #cccccc"
+                                
+                                # Create clickable color block
+                                if st.button(
+                                    "✓" if is_selected else " ",
+                                    key=f'color_btn_{category}_{color_name}',
+                                    help=color_name,
+                                    use_container_width=True
+                                ):
+                                    st.session_state['category_colors'][category] = color_hex
+                                    st.rerun()
+                                
+                                # Show color preview below button
+                                st.markdown(
+                                    f'<div style="background-color: {color_hex}; height: 30px; border-radius: 3px; border: {border_style}; margin-top: -10px;"></div>',
+                                    unsafe_allow_html=True
+                                )
         else:
             st.session_state['category_column'] = 'None'
             st.session_state['category_colors'] = {}
