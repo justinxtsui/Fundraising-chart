@@ -49,7 +49,7 @@ st.markdown("""
     
     /* Main content background */
     .main {
-        background-color: #F7F7F7;
+        background-color: #F9FAFB;
     }
     
     /* Sidebar with color accent */
@@ -552,55 +552,84 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # --- STREAMLIT APP LAYOUT ---
 
-# 1. MAIN APPLICATION TITLE
+# 1. MAIN APPLICATION TITLE - Enhanced Professional Design
 st.markdown("""
-    <div style="background: #FFFFFF; 
-                padding: 0; 
-                margin: -3rem -3rem 2rem -3rem;
-                border-bottom: 4px solid #302A7E;">
-        <div style="background: #302A7E; 
-                    padding: 12px 0;">
-            <div style="max-width: 1200px; margin: 0 auto; padding: 0 3rem;">
-                <span style="color: #FFFFFF; 
-                             font-size: 12px; 
-                             font-weight: 700; 
-                             letter-spacing: 2px;
-                             text-transform: uppercase;">
-                    Data Visualization Tool
-                </span>
-            </div>
-        </div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 40px 3rem;">
-            <h1 style="color: #000000; 
-                       margin: 0 0 16px 0; 
-                       font-size: 36px; 
-                       font-weight: 800;
-                       letter-spacing: -1.5px;">
-                Time Series Chart Generator
-            </h1>
-            <p style="color: #666666; 
-                      margin: 0 0 24px 0; 
-                      font-size: 17px;
-                      line-height: 28px;
-                      font-weight: 400;
-                      max-width: 650px;">
-                Turn any fundraising or grant export into a time series chart – JT
+    <style>
+    .main-header {
+        background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%);
+        padding: 0;
+        margin: -3rem -3rem 3rem -3rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 48px 3rem;
+    }
+    
+    .header-label {
+        color: #D0CCE5;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        display: inline-block;
+    }
+    
+    .main-title {
+        color: #FFFFFF;
+        margin: 0 0 16px 0;
+        font-size: 42px;
+        font-weight: 800;
+        letter-spacing: -1.5px;
+        line-height: 1.2;
+    }
+    
+    .subtitle {
+        color: #D0CCE5;
+        margin: 0 0 28px 0;
+        font-size: 18px;
+        line-height: 1.6;
+        font-weight: 400;
+        max-width: 680px;
+    }
+    
+    .cta-button {
+        color: #302A7E;
+        background: #FFFFFF;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        border-radius: 6px;
+        letter-spacing: 0.3px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    </style>
+    
+    <div class="main-header">
+        <div class="header-content">
+            <div class="header-label">📊 Data Visualization Platform</div>
+            <h1 class="main-title">Time Series Chart Generator</h1>
+            <p class="subtitle">
+                Transform your fundraising or grant export data into professional, 
+                publication-ready time series visualizations – Built by JT
             </p>
             <a href="https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119" 
                target="_blank" 
-               style="color: #FFFFFF;
-                      background: #302A7E;
-                      text-decoration: none; 
-                      font-size: 14px; 
-                      font-weight: 700;
-                      display: inline-flex;
-                      align-items: center;
-                      gap: 8px;
-                      padding: 12px 24px;
-                      border-radius: 4px;
-                      letter-spacing: 0.5px;
-                      text-transform: uppercase;">
-               <span>Beauhurst Search</span>
+               class="cta-button">
+               <span>Launch Beauhurst Search</span>
                <span style="font-size: 18px;">→</span>
             </a>
         </div>
@@ -990,156 +1019,223 @@ if 'df_base' in locals() and df_base is not None:
     st.session_state['buf_svg'] = buf_svg
 
 else:
-    # Message for initial load - elegant alert
+    # Message for initial load - Professional alert card
     st.markdown("""
-        <div style="background: #E8F4FD; 
-                    padding: 20px 28px; 
-                    border-radius: 0;
-                    border-left: 4px solid #1E88E5;
-                    margin: 32px 0;">
-            <p style="margin: 0; 
-                      font-size: 15px; 
-                      color: #000000;
-                      line-height: 24px;
-                      font-weight: 500;">
-                <strong style="color: #1E88E5;">Get Started:</strong> Upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.
-            </p>
+        <div style="background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); 
+                    padding: 24px 32px; 
+                    border-radius: 12px;
+                    border: 2px solid #C7D2FE;
+                    margin: 0 0 32px 0;
+                    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);">
+            <div style="display: flex; align-items: start; gap: 16px;">
+                <div style="flex-shrink: 0; 
+                           background: #FFFFFF; 
+                           width: 48px; 
+                           height: 48px; 
+                           border-radius: 50%; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);">
+                    <span style="font-size: 24px;">📤</span>
+                </div>
+                <div>
+                    <h4 style="margin: 0 0 8px 0; 
+                               color: #312E81; 
+                               font-size: 18px; 
+                               font-weight: 700;">
+                        Get Started
+                    </h4>
+                    <p style="margin: 0; 
+                              font-size: 15px; 
+                              color: #4C1D95;
+                              line-height: 1.6;
+                              font-weight: 500;">
+                        Upload your data file using the controls in the <strong>sidebar (Section 1)</strong> to begin creating your visualization.
+                    </p>
+                </div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Expected Data Format Card - elegant design
-    st.markdown("""
-        <div style="background: #FFFFFF; 
-                    padding: 32px; 
-                    border-radius: 0; 
-                    margin: 32px 0;
-                    border-left: 6px solid #302A7E;">
-            <h3 style="color: #000000; 
-                       margin: 0 0 20px 0; 
-                       font-size: 24px; 
-                       font-weight: 700;
-                       letter-spacing: -0.5px;">
-                Expected Data Format
-            </h3>
-            <p style="color: #666666; 
-                      font-size: 16px; 
-                      line-height: 1.7; 
-                      margin: 0;
-                      font-weight: 400;">
-                Your file must contain, at minimum, a date column (either <code>Deal date</code> or <code>Date the participant received the grant</code>) and a value column (either <code>Amount raised (converted to GBP)</code> or <code>Amount received (converted to GBP)</code>).
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    # How It Works Card - containing all three steps
+    # Expected Data Format Card - Professional design with icon
     st.markdown("""
         <div style="background: #FFFFFF; 
-                    padding: 32px; 
-                    border-radius: 0; 
-                    margin: 32px 0 16px 0;
-                    border-left: 6px solid #302A7E;">
-            <h3 style="color: #000000; 
-                       margin: 0 0 16px 0; 
-                       font-size: 24px; 
-                       font-weight: 700;
-                       letter-spacing: -0.5px;">
-                How It Works
-            </h3>
-            <p style="color: #666666; 
-                      font-size: 16px; 
-                      line-height: 1.7; 
-                      margin: 0 0 40px 0;
-                      font-weight: 400;">
-                This generator creates professional time series charts visualizing value (bars) and count (line) over time.
-            </p>
+                    padding: 36px; 
+                    border-radius: 12px; 
+                    margin: 0 0 24px 0;
+                    border: 2px solid #E5E7EB;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="display: flex; align-items: start; gap: 20px;">
+                <div style="flex-shrink: 0; 
+                           background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%); 
+                           width: 56px; 
+                           height: 56px; 
+                           border-radius: 12px; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 4px 8px rgba(48, 42, 126, 0.25);">
+                    <span style="font-size: 28px;">📊</span>
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="color: #1F2937; 
+                               margin: 0 0 16px 0; 
+                               font-size: 22px; 
+                               font-weight: 700;
+                               letter-spacing: -0.5px;">
+                        Expected Data Format
+                    </h3>
+                    <p style="color: #6B7280; 
+                              font-size: 15px; 
+                              line-height: 1.7; 
+                              margin: 0;
+                              font-weight: 400;">
+                        Your file must contain, at minimum, a <strong>date column</strong> (either 
+                        <code style="background: #F3F4F6; padding: 2px 8px; border-radius: 4px; font-size: 14px;">Deal date</code> or 
+                        <code style="background: #F3F4F6; padding: 2px 8px; border-radius: 4px; font-size: 14px;">Date the participant received the grant</code>) 
+                        and a <strong>value column</strong> (either 
+                        <code style="background: #F3F4F6; padding: 2px 8px; border-radius: 4px; font-size: 14px;">Amount raised (converted to GBP)</code> or 
+                        <code style="background: #F3F4F6; padding: 2px 8px; border-radius: 4px; font-size: 14px;">Amount received (converted to GBP)</code>).
+                    </p>
+                </div>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Step 1 inside the card
-    col1_1, col1_2 = st.columns([1, 11])
-    with col1_1:
-        st.markdown("""
-            <div style="width: 48px; 
-                        height: 48px; 
-                        background: #302A7E; 
-                        color: white; 
-                        border-radius: 0; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center; 
-                        font-weight: 800;
-                        font-size: 20px;">
-                1
+    # How It Works Card - Modern professional design
+    st.markdown("""
+        <div style="background: #FFFFFF; 
+                    padding: 36px; 
+                    border-radius: 12px; 
+                    margin: 0;
+                    border: 2px solid #E5E7EB;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div style="display: flex; align-items: start; gap: 20px; margin-bottom: 32px;">
+                <div style="flex-shrink: 0; 
+                           background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%); 
+                           width: 56px; 
+                           height: 56px; 
+                           border-radius: 12px; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 4px 8px rgba(48, 42, 126, 0.25);">
+                    <span style="font-size: 28px;">⚙️</span>
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="color: #1F2937; 
+                               margin: 0 0 12px 0; 
+                               font-size: 22px; 
+                               font-weight: 700;
+                               letter-spacing: -0.5px;">
+                        How It Works
+                    </h3>
+                    <p style="color: #6B7280; 
+                              font-size: 15px; 
+                              line-height: 1.7; 
+                              margin: 0;
+                              font-weight: 400;">
+                        Create professional time series charts in three simple steps. Visualize your data with customizable bars and trend lines.
+                    </p>
+                </div>
             </div>
-        """, unsafe_allow_html=True)
-    with col1_2:
-        st.markdown("""
-            <div style="padding-top: 4px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: #000000;">Upload</h4>
-                <p style="margin: 0; font-size: 15px; color: #666666; line-height: 1.6;">Provide your data file in the sidebar.</p>
+            
+            <!-- Step 1 -->
+            <div style="display: flex; gap: 20px; margin-bottom: 28px;">
+                <div style="flex-shrink: 0; 
+                           background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%); 
+                           width: 52px; 
+                           height: 52px; 
+                           border-radius: 10px; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 2px 6px rgba(48, 42, 126, 0.3);">
+                    <span style="color: #FFFFFF; font-size: 22px; font-weight: 800;">1</span>
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="color: #1F2937; 
+                               margin: 0 0 6px 0; 
+                               font-size: 17px; 
+                               font-weight: 700;">
+                        Upload Your Data
+                    </h4>
+                    <p style="color: #6B7280; 
+                              margin: 0; 
+                              font-size: 14px; 
+                              line-height: 1.6;">
+                        Provide your Excel or CSV file in the sidebar.
+                    </p>
+                </div>
             </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)
-    
-    # Step 2 inside the card
-    col2_1, col2_2 = st.columns([1, 11])
-    with col2_1:
-        st.markdown("""
-            <div style="width: 48px; 
-                        height: 48px; 
-                        background: #302A7E; 
-                        color: white; 
-                        border-radius: 0; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center; 
-                        font-weight: 800;
-                        font-size: 20px;">
-                2
+            
+            <!-- Step 2 -->
+            <div style="display: flex; gap: 20px; margin-bottom: 28px;">
+                <div style="flex-shrink: 0; 
+                           background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%); 
+                           width: 52px; 
+                           height: 52px; 
+                           border-radius: 10px; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 2px 6px rgba(48, 42, 126, 0.3);">
+                    <span style="color: #FFFFFF; font-size: 22px; font-weight: 800;">2</span>
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="color: #1F2937; 
+                               margin: 0 0 6px 0; 
+                               font-size: 17px; 
+                               font-weight: 700;">
+                        Configure Your Chart
+                    </h4>
+                    <p style="color: #6B7280; 
+                              margin: 0 0 10px 0; 
+                              font-size: 14px; 
+                              line-height: 1.6;">
+                        Use the sidebar controls to customize:
+                    </p>
+                    <ul style="color: #6B7280; 
+                               margin: 0; 
+                               padding-left: 20px; 
+                               font-size: 14px; 
+                               line-height: 1.8;">
+                        <li>Chart title and time range</li>
+                        <li>Visual elements (bars & lines)</li>
+                        <li>Stacked bars by category</li>
+                        <li>Data filters</li>
+                    </ul>
+                </div>
             </div>
-        """, unsafe_allow_html=True)
-    with col2_2:
-        st.markdown("""
-            <div style="padding-top: 4px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: #000000;">Configure</h4>
-                <p style="margin: 0 0 12px 0; font-size: 15px; color: #666666; line-height: 1.6;">Use the controls in the sidebar sections to customize your chart:</p>
+            
+            <!-- Step 3 -->
+            <div style="display: flex; gap: 20px;">
+                <div style="flex-shrink: 0; 
+                           background: linear-gradient(135deg, #302A7E 0%, #4A4399 100%); 
+                           width: 52px; 
+                           height: 52px; 
+                           border-radius: 10px; 
+                           display: flex; 
+                           align-items: center; 
+                           justify-content: center;
+                           box-shadow: 0 2px 6px rgba(48, 42, 126, 0.3);">
+                    <span style="color: #FFFFFF; font-size: 22px; font-weight: 800;">3</span>
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="color: #1F2937; 
+                               margin: 0 0 6px 0; 
+                               font-size: 17px; 
+                               font-weight: 700;">
+                        View & Download
+                    </h4>
+                    <p style="color: #6B7280; 
+                              margin: 0; 
+                              font-size: 14px; 
+                              line-height: 1.6;">
+                        Your chart appears instantly with high-resolution download options.
+                    </p>
+                </div>
             </div>
-        """, unsafe_allow_html=True)
-        st.markdown("""
-        - Set your chart title
-        - Filter the time range
-        - Choose visual elements
-        - Enable stacked bars
-        - Apply data filters
-        """)
-    
-    st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)
-    
-    # Step 3 inside the card
-    col3_1, col3_2 = st.columns([1, 11])
-    with col3_1:
-        st.markdown("""
-            <div style="width: 48px; 
-                        height: 48px; 
-                        background: #302A7E; 
-                        color: white; 
-                        border-radius: 0; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center; 
-                        font-weight: 800;
-                        font-size: 20px;">
-                3
-            </div>
-        """, unsafe_allow_html=True)
-    with col3_2:
-        st.markdown("""
-            <div style="padding-top: 4px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: #000000;">View & Download</h4>
-                <p style="margin: 0; font-size: 15px; color: #666666; line-height: 1.6;">The generated chart will appear instantly here, ready for high-resolution download.</p>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    # Close the How It Works card
-    st.markdown("<div style='padding: 16px;'></div></div>", unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
