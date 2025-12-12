@@ -643,17 +643,11 @@ with st.sidebar:
                     current_color = st.session_state['category_colors'].get(category, CATEGORY_COLORS[idx % len(CATEGORY_COLORS)])
                     
                     # Create two columns: category name and color dropdown
-                    col1, col2 = st.columns([2, 1])
+                    col1, col2 = st.columns([3, 2])
                     
                     with col1:
-                        # Category name with color indicator
-                        text_color = 'white' if is_dark_color(current_color) else '#333'
-                        st.markdown(
-                            f'<div style="background-color: {current_color}; '
-                            f'padding: 10px 16px; border-radius: 6px; margin-top: 8px;">'
-                            f'<strong style="color: {text_color};">{category}</strong></div>',
-                            unsafe_allow_html=True
-                        )
+                        # Just the category name in plain text
+                        st.markdown(f"**{category}**")
                     
                     with col2:
                         # Find current color name
@@ -666,13 +660,17 @@ with st.sidebar:
                         if current_color_name is None:
                             current_color_name = list(PREDEFINED_COLORS.keys())[0]
                         
-                        color_names = list(PREDEFINED_COLORS.keys())
+                        # Create color options with colored squares
+                        color_options = []
+                        for name, hex_code in PREDEFINED_COLORS.items():
+                            # Create HTML with colored square
+                            color_options.append(name)
                         
-                        # Simple dropdown for color selection
+                        # Dropdown with color names
                         selected_color_name = st.selectbox(
-                            "Color",
-                            options=color_names,
-                            index=color_names.index(current_color_name),
+                            f"Color for {category}",
+                            options=color_options,
+                            index=color_options.index(current_color_name),
                             key=f'color_select_{category}',
                             label_visibility='collapsed'
                         )
