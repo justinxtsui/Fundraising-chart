@@ -420,8 +420,28 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # 1. MAIN APPLICATION TITLE
 st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True)
-st.markdown("Turn any fundraising or grant export into a time series chart – JT")
-st.markdown("Link to Beauhurst Advanced search: [Here](https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119)")
+
+# Styled description box
+st.markdown("""
+    <div style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+                padding: 20px; 
+                border-radius: 10px; 
+                border-left: 5px solid #302A7E; 
+                margin: 15px 0;">
+        <p style="margin: 0 0 10px 0; font-size: 16px; color: #333;">
+            <strong>Turn any fundraising or grant export into a time series chart – JT</strong>
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #555;">
+            📊 Link to Beauhurst Advanced search: 
+            <a href="https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119" 
+               target="_blank" 
+               style="color: #302A7E; font-weight: 600; text-decoration: none;">
+               Click here →
+            </a>
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Initialize buffers and session state
