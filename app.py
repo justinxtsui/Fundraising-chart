@@ -595,10 +595,14 @@ with st.sidebar:
                         background: #f0f0f0 !important;
                     }
                     
-                    /* Style color square buttons - smaller size */
+                    /* Style color square buttons - make them square */
                     div[data-testid="stButton"] > button {
-                        min-height: 45px;
-                        padding: 0;
+                        height: 50px !important;
+                        min-height: 50px !important;
+                        max-height: 50px !important;
+                        aspect-ratio: 1 !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
                     }
                     </style>
                 """, unsafe_allow_html=True)
@@ -648,40 +652,41 @@ with st.sidebar:
                 for idx, category in enumerate(sorted_categories):
                     current_color = st.session_state['category_colors'].get(category, CATEGORY_COLORS[idx % len(CATEGORY_COLORS)])
                     
-                    # Create row with category name and 3 color squares
-                    cols = st.columns([3, 1, 1, 1])
+                    # Create row - tighter spacing
+                    cols = st.columns([2, 0.7, 0.7, 0.7])
                     
                     with cols[0]:
-                        # Plain category name, no decorations
-                        st.markdown(f"<div style='padding-top: 8px; font-size: 16px;'><strong>{category}</strong></div>", unsafe_allow_html=True)
+                        # Category name aligned with boxes
+                        st.markdown(f"<div style='padding-top: 12px; font-size: 16px;'><strong>{category}</strong></div>", unsafe_allow_html=True)
                     
-                    # Three color squares
+                    # Three square color boxes
                     for col_idx, (color_name, color_hex) in enumerate(PREDEFINED_COLORS.items()):
                         with cols[col_idx + 1]:
                             is_selected = (current_color == color_hex)
                             
                             # Clickable button
                             if st.button(
-                                "✓" if is_selected else " ",
+                                " ",
                                 key=f'color_{category}_{color_name}',
                                 use_container_width=True
                             ):
                                 st.session_state['category_colors'][category] = color_hex
                                 st.rerun()
                             
-                            # Smaller color square visualization
+                            # Square color box overlay - maintaining aspect ratio
                             border_width = "3px" if is_selected else "2px"
                             st.markdown(
-                                f'<div style="background-color: {color_hex}; height: 45px; '
-                                f'border: {border_width} solid {"#000" if is_selected else "#ddd"}; '
-                                f'border-radius: 4px; margin-top: -53px; pointer-events: none; '
+                                f'<div style="background-color: {color_hex}; '
+                                f'width: 100%; aspect-ratio: 1; height: 50px; '
+                                f'border: {border_width} solid {"#000" if is_selected else "#ccc"}; '
+                                f'border-radius: 4px; margin-top: -50px; pointer-events: none; '
                                 f'display: flex; align-items: center; justify-content: center; '
                                 f'color: {"white" if is_dark_color(color_hex) else "black"}; '
                                 f'font-size: 20px; font-weight: bold;">{"✓" if is_selected else ""}</div>',
                                 unsafe_allow_html=True
                             )
                     
-                    st.markdown("<div style='margin-bottom: 5px;'></div>", unsafe_allow_html=True)
+                    st.markdown("<div style='margin-bottom: 8px;'></div>", unsafe_allow_html=True)
         else:
             st.session_state['category_column'] = 'None'
             st.session_state['category_colors'] = {}
