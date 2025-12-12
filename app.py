@@ -808,6 +808,12 @@ else:
     st.info("⬆️ **Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.**")
     st.markdown("---")
     
+    st.subheader("Expected Data Format")
+    st.markdown(f"""
+    Your file must contain, at minimum, a date column (either **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**) and a value column (either **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**).
+    """)
+    
+    st.markdown("---")
     st.subheader("How It Works")
     st.markdown("""
     This generator creates professional time series charts visualizing value (bars) and count (line) over time.
@@ -820,10 +826,4 @@ else:
         - Enable stacked bars (Section 5)
         - Apply data filters (Section 6)
     3.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.
-    """)
-
-    st.markdown("---")
-    st.subheader("Expected Data Format")
-    st.markdown(f"""
-    Your file must contain, at minimum, a date column (either **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**) and a value column (either **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**).
     """)
