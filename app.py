@@ -999,7 +999,7 @@ else:
         </div>
     """, unsafe_allow_html=True)
     
-    # How It Works Card
+    # How It Works Card - with proper columns
     st.markdown("""
         <div style="background: #FFFFFF; 
                     padding: 24px; 
@@ -1015,119 +1015,84 @@ else:
             <p style="color: #65676B; 
                       font-size: 15px; 
                       line-height: 1.5; 
-                      margin: 0 0 20px 0;">
+                      margin: 0 0 24px 0;">
                 This generator creates professional time series charts visualizing value (bars) and count (line) over time.
             </p>
-            
-            <div style="display: flex; 
-                        flex-direction: column; 
-                        gap: 16px;">
-                <!-- Step 1 -->
-                <div style="display: flex; 
-                            gap: 16px;">
-                    <div style="flex-shrink: 0; 
-                                width: 32px; 
-                                height: 32px; 
-                                background: #302A7E; 
-                                color: white; 
-                                border-radius: 50%; 
-                                display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                font-weight: 600;
-                                font-size: 15px;">
-                        1
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="color: #1C1E21; 
-                                   margin: 0 0 4px 0; 
-                                   font-size: 17px; 
-                                   font-weight: 600;">
-                            Upload
-                        </h4>
-                        <p style="color: #65676B; 
-                                  margin: 0; 
-                                  font-size: 15px; 
-                                  line-height: 1.4;">
-                            Provide your data file in the sidebar.
-                        </p>
-                    </div>
-                </div>
-                
-                <!-- Step 2 -->
-                <div style="display: flex; 
-                            gap: 16px;">
-                    <div style="flex-shrink: 0; 
-                                width: 32px; 
-                                height: 32px; 
-                                background: #302A7E; 
-                                color: white; 
-                                border-radius: 50%; 
-                                display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                font-weight: 600;
-                                font-size: 15px;">
-                        2
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="color: #1C1E21; 
-                                   margin: 0 0 4px 0; 
-                                   font-size: 17px; 
-                                   font-weight: 600;">
-                            Configure
-                        </h4>
-                        <p style="color: #65676B; 
-                                  margin: 0 0 8px 0; 
-                                  font-size: 15px; 
-                                  line-height: 1.4;">
-                            Use the controls in the sidebar sections to customize your chart:
-                        </p>
-                        <ul style="margin: 0; 
-                                   padding-left: 20px; 
-                                   color: #65676B; 
-                                   font-size: 15px; 
-                                   line-height: 1.6;">
-                            <li>Set your chart title</li>
-                            <li>Filter the time range</li>
-                            <li>Choose visual elements</li>
-                            <li>Enable stacked bars</li>
-                            <li>Apply data filters</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Step 3 -->
-                <div style="display: flex; 
-                            gap: 16px;">
-                    <div style="flex-shrink: 0; 
-                                width: 32px; 
-                                height: 32px; 
-                                background: #302A7E; 
-                                color: white; 
-                                border-radius: 50%; 
-                                display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                font-weight: 600;
-                                font-size: 15px;">
-                        3
-                    </div>
-                    <div style="flex: 1;">
-                        <h4 style="color: #1C1E21; 
-                                   margin: 0 0 4px 0; 
-                                   font-size: 17px; 
-                                   font-weight: 600;">
-                            View & Download
-                        </h4>
-                        <p style="color: #65676B; 
-                                  margin: 0; 
-                                  font-size: 15px; 
-                                  line-height: 1.4;">
-                            The generated chart will appear instantly here, ready for high-resolution download.
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
     """, unsafe_allow_html=True)
+    
+    # Step 1
+    col1_1, col1_2 = st.columns([1, 10])
+    with col1_1:
+        st.markdown("""
+            <div style="width: 32px; 
+                        height: 32px; 
+                        background: #302A7E; 
+                        color: white; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-weight: 600;
+                        font-size: 15px;
+                        text-align: center;
+                        line-height: 32px;">
+                1
+            </div>
+        """, unsafe_allow_html=True)
+    with col1_2:
+        st.markdown("**Upload**")
+        st.markdown("Provide your data file in the sidebar.")
+    
+    # Step 2
+    col2_1, col2_2 = st.columns([1, 10])
+    with col2_1:
+        st.markdown("""
+            <div style="width: 32px; 
+                        height: 32px; 
+                        background: #302A7E; 
+                        color: white; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-weight: 600;
+                        font-size: 15px;
+                        text-align: center;
+                        line-height: 32px;">
+                2
+            </div>
+        """, unsafe_allow_html=True)
+    with col2_2:
+        st.markdown("**Configure**")
+        st.markdown("Use the controls in the sidebar sections to customize your chart:")
+        st.markdown("""
+        - Set your chart title
+        - Filter the time range
+        - Choose visual elements
+        - Enable stacked bars
+        - Apply data filters
+        """)
+    
+    # Step 3
+    col3_1, col3_2 = st.columns([1, 10])
+    with col3_1:
+        st.markdown("""
+            <div style="width: 32px; 
+                        height: 32px; 
+                        background: #302A7E; 
+                        color: white; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-weight: 600;
+                        font-size: 15px;
+                        text-align: center;
+                        line-height: 32px;">
+                3
+            </div>
+        """, unsafe_allow_html=True)
+    with col3_2:
+        st.markdown("**View & Download**")
+        st.markdown("The generated chart will appear instantly here, ready for high-resolution download.")
