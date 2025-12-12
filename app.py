@@ -420,6 +420,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # 1. MAIN APPLICATION TITLE
 st.markdown(f'<h1 style="color:{APP_TITLE_COLOR};">Time Series Chart Generator</h1>', unsafe_allow_html=True)
+st.markdown("Turn any fundraising or grant export into a time series chart – JT")
+st.markdown("Link to Beauhurst Advanced search: [Here](https://platform.beauhurst.com/search/advancedsearch/?avs_json=eyJiYXNlIjoiY29tcGFueSIsImNvbWJpbmUiOiJhbmQiLCJjaGlsZHJlbiI6W119)")
 st.markdown("---")
 
 # Initialize buffers and session state
@@ -805,7 +807,7 @@ if 'df_base' in locals() and df_base is not None:
 
 else:
     # Message for initial load
-    st.info("👈🏻 **Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.**")
+    st.info("⬆️ **Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.**")
     st.markdown("---")
     
     st.subheader("Expected Data Format")
@@ -816,14 +818,14 @@ else:
     st.markdown("---")
     st.subheader("How It Works")
     st.markdown("""
-    This bot generates time-series charts visualising value (bars) and count (line) over time.
+    This generator creates professional time series charts visualizing value (bars) and count (line) over time.
 
     1.  **Upload:** Provide your data file in the sidebar.
     2.  **Configure:** Use the controls in the sidebar sections to:
-        - Set your chart title
-        - Filter the time range
-        - Choose visual elements
-        - Enable stacked bars
-        - Apply data filters 
+        - Set your chart title (Section 2)
+        - Filter the time range (Section 3)
+        - Choose visual elements (Section 4)
+        - Enable stacked bars (Section 5)
+        - Apply data filters (Section 6)
     3.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.
     """)
