@@ -565,7 +565,7 @@ with st.sidebar:
             # Color picker for each category
             if category_column != 'None':
                 st.subheader("Category Order & Colors")
-                st.caption("📦 Drag to reorder (bottom to top) | Choose colors for each category")
+                st.caption("📦 Drag categories to reorder (top = top of chart, bottom = bottom of chart)")
                 
                 # Get unique categories from the selected column
                 unique_categories = sorted(df_base[category_column].dropna().unique())
@@ -578,12 +578,33 @@ with st.sidebar:
                 
                 # Initialize sorted category list if not exists or if categories changed
                 if 'sorted_categories' not in st.session_state or set(st.session_state.get('sorted_categories', [])) != set(unique_categories):
-                    st.session_state['sorted_categories'] = unique_categories
+                    st.session_state['sorted_categories'] = list(reversed(unique_categories))  # Reversed so top = top
                 
-                # Drag-and-drop sorting interface
-                st.write("**Stack Order (Drag to Rearrange):**")
+                color_names = list(PREDEFINED_COLORS.keys())
+                
+                # Create draggable items with color selectors
+                draggable_items = []
+                for category in st.session_state['sorted_categories']:
+                    # Use default color if not set
+                    idx = st.session_state['sorted_categories'].index(category)
+                    default_color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
+                    current_color = st.session_state['category_colors'].get(category, default_color)
+                    
+                    # Find the current color name
+                    current_color_name = None
+                    for name, hex_code in PREDEFINED_COLORS.items():
+                        if hex_code == current_color:
+                            current_color_name = name
+                            break
+                    
+                    if current_color_name is None:
+                        current_color_name = color_names[idx % len(color_names)]
+                    
+                    draggable_items.append(category)
+                
+                # Drag-and-drop sorting interface with integrated color selection
                 sorted_categories = sort_items(
-                    st.session_state['sorted_categories'],
+                    draggable_items,
                     direction='vertical',
                     key='category_sorter'
                 )
@@ -591,16 +612,16 @@ with st.sidebar:
                 # Update sorted categories in session state
                 st.session_state['sorted_categories'] = sorted_categories
                 
-                # Update category order based on sorted list (1 = bottom)
+                # Update category order based on sorted list (higher number = higher in stack)
+                # Reverse the order so first item (top) gets highest number
+                num_categories = len(sorted_categories)
                 for idx, category in enumerate(sorted_categories):
-                    st.session_state['category_order'][category] = idx + 1
+                    st.session_state['category_order'][category] = num_categories - idx
                 
                 st.markdown("---")
+                st.write("**Colors for each category:**")
                 
-                # Color selectors for each category (in sorted order)
-                color_names = list(PREDEFINED_COLORS.keys())
-                
-                st.write("**Category Colors:**")
+                # Color selectors for each category (in sorted order from drag-and-drop)
                 for idx, category in enumerate(sorted_categories):
                     # Use default color if not set
                     default_color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
@@ -616,29 +637,24 @@ with st.sidebar:
                     if current_color_name is None:
                         current_color_name = color_names[idx % len(color_names)]
                     
-                    # Create columns for position indicator, color selector, and preview
-                    col1, col2, col3 = st.columns([0.5, 2, 3])
+                    # Create columns for color selector and preview
+                    col1, col2 = st.columns([2, 3])
                     
                     with col1:
-                        # Position indicator
-                        st.markdown(f"**{idx + 1}**")
-                    
-                    with col2:
                         # Color selector
                         selected_name = st.selectbox(
-                            f"Color",
+                            f"{category}",
                             options=color_names,
                             index=color_names.index(current_color_name) if current_color_name in color_names else 0,
-                            key=f'color_selector_{category}',
-                            label_visibility='collapsed'
+                            key=f'color_selector_{category}'
                         )
                     
-                    with col3:
+                    with col2:
                         # Display color swatch preview with category name
                         selected_hex = PREDEFINED_COLORS[selected_name]
                         st.markdown(
-                            f'<div style="background-color: {selected_hex}; padding: 10px; border-radius: 5px; text-align: center; color: {"white" if is_dark_color(selected_hex) else "black"};">'
-                            f'<b>{category}</b> - {selected_name}</div>',
+                            f'<div style="background-color: {selected_hex}; padding: 12px; border-radius: 5px; text-align: center; color: {"white" if is_dark_color(selected_hex) else "black"}; margin-top: 5px;">'
+                            f'<b>{category}</b></div>',
                             unsafe_allow_html=True
                         )
                     
