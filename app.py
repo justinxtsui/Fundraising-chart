@@ -39,7 +39,7 @@ st.set_page_config(page_title="Time Series Chart Generator", layout="wide", init
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'Public Sans', 'DejaVu Sans']
 
-# Enhanced Meta-inspired design with visual polish
+# Clean flat modern design - no gradients or shadows
 st.markdown("""
     <style>
     /* Modern system fonts */
@@ -47,15 +47,15 @@ st.markdown("""
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     }
     
-    /* Main content background with subtle gradient */
+    /* Main content background */
     .main {
-        background: linear-gradient(135deg, #F0F2F5 0%, #E8EAF0 100%);
+        background-color: #F0F2F5;
     }
     
-    /* Sidebar - premium white with stronger shadow */
+    /* Sidebar - clean white */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #FFFFFF 0%, #FAFBFC 100%);
-        box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+        background-color: #FFFFFF;
+        border-right: 1px solid #E4E6EB;
     }
     
     [data-testid="stSidebar"] h2 {
@@ -65,18 +65,12 @@ st.markdown("""
         margin-bottom: 16px;
         padding-bottom: 12px;
         border-bottom: 2px solid #302A7E;
-        background: linear-gradient(90deg, #302A7E 0%, transparent 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
     }
     
-    /* Headers with better hierarchy */
+    /* Headers */
     h1 {
         font-weight: 700;
         color: #1C1E21;
-        background: linear-gradient(135deg, #1C1E21 0%, #4A4D52 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
     }
     
     h2, h3 {
@@ -84,89 +78,59 @@ st.markdown("""
         color: #1C1E21;
     }
     
-    /* Buttons - modern with premium hover */
+    /* Buttons - flat design */
     .stButton > button {
         border-radius: 8px;
         font-weight: 600;
         font-size: 15px;
         padding: 10px 16px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease;
         border: none;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stButton > button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        transition: left 0.5s;
-    }
-    
-    .stButton > button:hover::before {
-        left: 100%;
     }
     
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(48, 42, 126, 0.25);
+        opacity: 0.9;
     }
     
-    /* Primary buttons with gradient */
+    /* Primary buttons */
     .stButton > button[kind="primary"] {
-        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%);
+        background: #302A7E;
         color: white;
     }
     
-    /* Download buttons with accent gradient */
+    /* Download buttons */
     .stDownloadButton > button {
-        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%);
+        background: #302A7E;
         color: white;
         border-radius: 8px;
         font-weight: 600;
         padding: 10px 16px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(48, 42, 126, 0.2);
     }
     
     .stDownloadButton > button:hover {
-        background: linear-gradient(135deg, #251F5E 0%, #3A2F7E 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(48, 42, 126, 0.3);
+        background: #251F5E;
     }
     
-    /* File uploader - premium bordered area */
+    /* File uploader */
     [data-testid="stFileUploader"] {
-        background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
-        border-radius: 12px;
+        background-color: #FFFFFF;
+        border-radius: 8px;
         padding: 20px;
         border: 2px dashed #CCD0D5;
-        transition: all 0.3s ease;
     }
     
-    [data-testid="stFileUploader"]:hover {
-        border-color: #302A7E;
-        box-shadow: 0 4px 12px rgba(48, 42, 126, 0.1);
-    }
-    
-    /* Input fields with focus effects */
+    /* Input fields */
     .stTextInput input, .stSelectbox select {
         border-radius: 8px;
         border: 1.5px solid #CCD0D5;
         padding: 10px 12px;
         font-size: 15px;
-        transition: all 0.3s ease;
         background: #FFFFFF;
     }
     
     .stTextInput input:focus, .stSelectbox select:focus {
         border-color: #302A7E;
-        box-shadow: 0 0 0 3px rgba(48, 42, 126, 0.1);
-        background: #FFFFFF;
+        outline: 2px solid rgba(48, 42, 126, 0.1);
     }
     
     /* Checkbox styling */
@@ -174,16 +138,16 @@ st.markdown("""
         font-size: 15px;
     }
     
-    /* Better spacing */
+    /* Spacing */
     .block-container {
         padding-top: 3rem;
         padding-bottom: 3rem;
         max-width: 1200px;
     }
     
-    /* Premium code blocks */
+    /* Code blocks */
     code {
-        background: linear-gradient(135deg, #F0F2F5 0%, #E8EAF0 100%);
+        background-color: #F0F2F5;
         padding: 4px 8px;
         border-radius: 4px;
         font-size: 0.9em;
@@ -193,23 +157,11 @@ st.markdown("""
         border: 1px solid #E4E6EB;
     }
     
-    /* Divider lines with gradient */
+    /* Divider lines */
     hr {
         border: none;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #E4E6EB, transparent);
+        border-top: 1px solid #E4E6EB;
         margin: 24px 0;
-    }
-    
-    /* Smooth scrolling */
-    html {
-        scroll-behavior: smooth;
-    }
-    
-    /* Selection color */
-    ::selection {
-        background: #302A7E;
-        color: white;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -595,28 +547,16 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
 
 # 1. MAIN APPLICATION TITLE
 st.markdown("""
-    <div style="background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 50%, #FFFFFF 100%); 
+    <div style="background: #FFFFFF; 
                 padding: 40px 0; 
                 margin: -3rem -3rem 2rem -3rem;
-                border-bottom: 1px solid #E4E6EB;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
-                position: relative;
-                overflow: hidden;">
-        <div style="position: absolute; 
-                    top: 0; 
-                    right: 0; 
-                    width: 300px; 
-                    height: 300px; 
-                    background: radial-gradient(circle, rgba(48,42,126,0.05) 0%, transparent 70%);
-                    border-radius: 50%;
-                    transform: translate(30%, -30%);"></div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 3rem; position: relative; z-index: 1;">
+                border-bottom: 1px solid #E4E6EB;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 3rem;">
             <div style="display: inline-block; 
                         padding: 6px 16px; 
-                        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%); 
+                        background: #302A7E; 
                         border-radius: 20px; 
-                        margin-bottom: 16px;
-                        box-shadow: 0 2px 8px rgba(48,42,126,0.2);">
+                        margin-bottom: 16px;">
                 <span style="color: white; 
                              font-size: 13px; 
                              font-weight: 600; 
@@ -629,11 +569,7 @@ st.markdown("""
                        margin: 0 0 12px 0; 
                        font-size: 32px; 
                        font-weight: 700;
-                       letter-spacing: -0.8px;
-                       background: linear-gradient(135deg, #1C1E21 0%, #302A7E 100%);
-                       -webkit-background-clip: text;
-                       -webkit-text-fill-color: transparent;
-                       background-clip: text;">
+                       letter-spacing: -0.8px;">
                 Time Series Chart Generator
             </h1>
             <p style="color: #65676B; 
@@ -653,11 +589,10 @@ st.markdown("""
                       align-items: center;
                       gap: 6px;
                       padding: 8px 16px;
-                      background: rgba(48,42,126,0.06);
-                      border-radius: 6px;
-                      transition: all 0.3s ease;">
+                      background: #F0F2F5;
+                      border-radius: 6px;">
                <span>Beauhurst Advanced Search</span>
-               <span style="font-size: 16px; transition: transform 0.3s ease;">→</span>
+               <span style="font-size: 16px;">→</span>
             </a>
         </div>
     </div>
@@ -1046,66 +981,33 @@ if 'df_base' in locals() and df_base is not None:
     st.session_state['buf_svg'] = buf_svg
 
 else:
-    # Message for initial load - Premium alert style
+    # Message for initial load
     st.markdown("""
-        <div style="background: linear-gradient(135deg, #E7F3FF 0%, #D6EBFF 100%); 
+        <div style="background: #E7F3FF; 
                     padding: 20px 24px; 
-                    border-radius: 12px;
+                    border-radius: 8px;
                     border-left: 4px solid #302A7E;
-                    margin: 24px 0;
-                    box-shadow: 0 2px 8px rgba(48,42,126,0.1);
-                    position: relative;
-                    overflow: hidden;">
-            <div style="position: absolute; 
-                        top: -20px; 
-                        right: -20px; 
-                        width: 100px; 
-                        height: 100px; 
-                        background: radial-gradient(circle, rgba(48,42,126,0.1) 0%, transparent 70%);
-                        border-radius: 50%;"></div>
+                    margin: 24px 0;">
             <p style="margin: 0; 
                       font-size: 15px; 
                       color: #1C1E21;
-                      line-height: 22px;
-                      position: relative;
-                      z-index: 1;">
+                      line-height: 22px;">
                 <strong style="color: #302A7E;">Get Started:</strong> Upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Expected Data Format Card - Enhanced
+    # Expected Data Format Card
     st.markdown("""
-        <div style="background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFC 100%); 
+        <div style="background: #FFFFFF; 
                     padding: 28px; 
-                    border-radius: 12px; 
+                    border-radius: 8px; 
                     margin: 24px 0;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.04), 
-                                0 4px 12px rgba(0,0,0,0.08),
-                                0 1px 2px rgba(48,42,126,0.1);
-                    border: 1px solid rgba(228,230,235,0.8);
-                    transition: all 0.3s ease;
-                    position: relative;
-                    overflow: hidden;">
-            <div style="position: absolute; 
-                        top: 0; 
-                        left: 0; 
-                        width: 100%; 
-                        height: 4px; 
-                        background: linear-gradient(90deg, #302A7E 0%, #8884B3 50%, #302A7E 100%);"></div>
+                    border: 1px solid #E4E6EB;">
             <h3 style="color: #1C1E21; 
                        margin: 0 0 16px 0; 
                        font-size: 22px; 
-                       font-weight: 600;
-                       display: flex;
-                       align-items: center;
-                       gap: 10px;">
-                <span style="display: inline-block;
-                             width: 8px;
-                             height: 8px;
-                             background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%);
-                             border-radius: 50%;
-                             box-shadow: 0 0 0 3px rgba(48,42,126,0.2);"></span>
+                       font-weight: 600;">
                 Expected Data Format
             </h3>
             <p style="color: #65676B; 
@@ -1117,37 +1019,17 @@ else:
         </div>
     """, unsafe_allow_html=True)
     
-    # How It Works Card - Enhanced header
+    # How It Works Card - containing all three steps
     st.markdown("""
-        <div style="background: linear-gradient(135deg, #FFFFFF 0%, #FAFBFC 100%); 
+        <div style="background: #FFFFFF; 
                     padding: 28px; 
-                    border-radius: 12px; 
+                    border-radius: 8px; 
                     margin: 24px 0;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.04), 
-                                0 4px 12px rgba(0,0,0,0.08),
-                                0 1px 2px rgba(48,42,126,0.1);
-                    border: 1px solid rgba(228,230,235,0.8);
-                    position: relative;
-                    overflow: hidden;">
-            <div style="position: absolute; 
-                        top: 0; 
-                        left: 0; 
-                        width: 100%; 
-                        height: 4px; 
-                        background: linear-gradient(90deg, #302A7E 0%, #8884B3 50%, #302A7E 100%);"></div>
+                    border: 1px solid #E4E6EB;">
             <h3 style="color: #1C1E21; 
                        margin: 0 0 12px 0; 
                        font-size: 22px; 
-                       font-weight: 600;
-                       display: flex;
-                       align-items: center;
-                       gap: 10px;">
-                <span style="display: inline-block;
-                             width: 8px;
-                             height: 8px;
-                             background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%);
-                             border-radius: 50%;
-                             box-shadow: 0 0 0 3px rgba(48,42,126,0.2);"></span>
+                       font-weight: 600;">
                 How It Works
             </h3>
             <p style="color: #65676B; 
@@ -1156,16 +1038,15 @@ else:
                       margin: 0 0 28px 0;">
                 This generator creates professional time series charts visualizing value (bars) and count (line) over time.
             </p>
-        </div>
     """, unsafe_allow_html=True)
     
-    # Step 1 - Enhanced with gradient badge
+    # Step 1 inside the card
     col1_1, col1_2 = st.columns([1, 10])
     with col1_1:
         st.markdown("""
             <div style="width: 40px; 
                         height: 40px; 
-                        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%); 
+                        background: #302A7E; 
                         color: white; 
                         border-radius: 50%; 
                         display: flex; 
@@ -1174,33 +1055,23 @@ else:
                         font-weight: 700;
                         font-size: 16px;
                         text-align: center;
-                        line-height: 40px;
-                        box-shadow: 0 4px 12px rgba(48,42,126,0.3), 
-                                    0 2px 4px rgba(48,42,126,0.2);
-                        position: relative;">
+                        line-height: 40px;">
                 1
-                <div style="position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 2px solid rgba(255,255,255,0.2);
-                            top: 0;
-                            left: 0;"></div>
             </div>
         """, unsafe_allow_html=True)
     with col1_2:
         st.markdown("**Upload**")
         st.markdown("Provide your data file in the sidebar.")
     
-    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
     
-    # Step 2 - Enhanced with gradient badge
+    # Step 2 inside the card
     col2_1, col2_2 = st.columns([1, 10])
     with col2_1:
         st.markdown("""
             <div style="width: 40px; 
                         height: 40px; 
-                        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%); 
+                        background: #302A7E; 
                         color: white; 
                         border-radius: 50%; 
                         display: flex; 
@@ -1209,18 +1080,8 @@ else:
                         font-weight: 700;
                         font-size: 16px;
                         text-align: center;
-                        line-height: 40px;
-                        box-shadow: 0 4px 12px rgba(48,42,126,0.3), 
-                                    0 2px 4px rgba(48,42,126,0.2);
-                        position: relative;">
+                        line-height: 40px;">
                 2
-                <div style="position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 2px solid rgba(255,255,255,0.2);
-                            top: 0;
-                            left: 0;"></div>
             </div>
         """, unsafe_allow_html=True)
     with col2_2:
@@ -1234,15 +1095,15 @@ else:
         - Apply data filters
         """)
     
-    st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
     
-    # Step 3 - Enhanced with gradient badge
+    # Step 3 inside the card
     col3_1, col3_2 = st.columns([1, 10])
     with col3_1:
         st.markdown("""
             <div style="width: 40px; 
                         height: 40px; 
-                        background: linear-gradient(135deg, #302A7E 0%, #4A3F9E 100%); 
+                        background: #302A7E; 
                         color: white; 
                         border-radius: 50%; 
                         display: flex; 
@@ -1251,20 +1112,13 @@ else:
                         font-weight: 700;
                         font-size: 16px;
                         text-align: center;
-                        line-height: 40px;
-                        box-shadow: 0 4px 12px rgba(48,42,126,0.3), 
-                                    0 2px 4px rgba(48,42,126,0.2);
-                        position: relative;">
+                        line-height: 40px;">
                 3
-                <div style="position: absolute;
-                            width: 100%;
-                            height: 100%;
-                            border-radius: 50%;
-                            border: 2px solid rgba(255,255,255,0.2);
-                            top: 0;
-                            left: 0;"></div>
             </div>
         """, unsafe_allow_html=True)
     with col3_2:
         st.markdown("**View & Download**")
         st.markdown("The generated chart will appear instantly here, ready for high-resolution download.")
+    
+    # Close the How It Works card
+    st.markdown("</div>", unsafe_allow_html=True)
