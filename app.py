@@ -120,7 +120,7 @@ def load_data(uploaded_file):
         original_value_column = 'raised'  # Track that it was "raised"
 
     try:
-        data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], errors='coerce')
+        data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], format='%d/%m/%Y', errors='coerce')
         data.dropna(subset=[DATE_COLUMN], inplace=True)
     except Exception:
         return None, f"Could not convert **`{DATE_COLUMN}`** to datetime format.", None
