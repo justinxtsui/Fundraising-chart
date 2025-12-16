@@ -27,9 +27,9 @@ PREDEFINED_COLORS = {
 # Define the default single bar color (third color in the palette for a lighter tone)
 SINGLE_BAR_COLOR = '#BBBAF6'
 # Define the prediction shade color (LIGHT GREY FILL for predicted bars)
-PREDICTION_SHADE_COLOR = '#F0F0F0' 
+PREDICTION_SHADE_COLOR = '#F0F0F0'
 # Define the prediction hatching color (BLACK HATCH for maximum contrast over light grey)
-PREDICTION_HATCH_COLOR = '#000000' 
+PREDICTION_HATCH_COLOR = '#000000'
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
@@ -77,7 +77,7 @@ def format_currency(value):
         if float(s).is_integer():
             s = str(int(float(s)))
     except:
-        pass 
+        pass
 
     sign = "-" if neg else ""
     return f"{sign}£{s}{unit}"
@@ -125,7 +125,9 @@ def load_data(uploaded_file):
         original_value_column = 'raised' # Track that it was "raised"
 
     try:
-        data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], format='%d/%m/%Y', errors='coerce')
+        # --- FIX: Use 'mixed' format to automatically infer and parse dates, handling YYYY-MM-DD and DD/MM/YYYY ---
+        data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], format='mixed', errors='coerce')
+        
         data.dropna(subset=[DATE_COLUMN], inplace=True)
         # Convert value column to numeric, setting errors='coerce' to turn bad values to NaN
         data[VALUE_COLUMN] = pd.to_numeric(data[VALUE_COLUMN], errors='coerce')
@@ -601,7 +603,7 @@ with st.sidebar:
             if start_year > end_year:
                 st.error("Start Year must be <= End Year. Please adjust.")
                 # We stop here to prevent running the chart generation with an invalid range
-                st.stop() 
+                st.stop()
                 
             year_range = (start_year, end_year)
             
@@ -895,7 +897,7 @@ with st.sidebar:
         st.session_state['filter_column'] = 'None'
         st.session_state['filter_values'] = []
         if 'sorted_categories' in st.session_state:
-             del st.session_state['sorted_categories']
+              del st.session_state['sorted_categories']
 
 
 # --- MAIN AREA: CHART DISPLAY ONLY ---
