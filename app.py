@@ -94,7 +94,7 @@ def is_dark_color(hex_color):
 
 @st.cache_data
 def load_data(uploaded_file):
-    """Loads and preprocesses the uploaded file, handling dual column names."""
+    """Loads and preprocesses the uploaded file, handling dual column names and date formats."""
     if uploaded_file.name.endswith('.csv'):
         data = pd.read_csv(uploaded_file)
     else:
@@ -125,8 +125,15 @@ def load_data(uploaded_file):
         original_value_column = 'raised' # Track that it was "raised"
 
     try:
-        # --- FIX: Use 'mixed' format to automatically infer and parse dates, handling YYYY-MM-DD and DD/MM/YYYY ---
+        # --- FIX 1: Use 'mixed' format to automatically infer and parse dates, handling YYYY-MM-DD and DD/MM/YYYY ---
         data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN], format='mixed', errors='coerce')
+        
+        # --- FIX 2: Convert potential filter/category columns to string for reliable multiselect/filtering ---
+        for col in data.columns:
+            if col not in [DATE_COLUMN, VALUE_COLUMN]:
+                # Convert to string and strip whitespace to clean up category names
+                data[col] = data[col].astype(str).str.strip() 
+        # ---------------------------------------------------------------------------------------------------------
         
         data.dropna(subset=[DATE_COLUMN], inplace=True)
         # Convert value column to numeric, setting errors='coerce' to turn bad values to NaN
@@ -136,7 +143,7 @@ def load_data(uploaded_file):
     except Exception as e:
         return None, f"An error occurred during data conversion: {e}", None
     
-    # *** FIX: Check if the DataFrame is empty after cleanup/conversion ***
+    # *** Final Check: Check if the DataFrame is empty after cleanup/conversion ***
     if data.empty:
         return None, "File loaded but contained no valid rows after processing (missing date or value).", None
 
@@ -682,6 +689,7 @@ with st.sidebar:
             st.session_state['stacked_enabled'] = stacked_enabled
 
             if stacked_enabled:
+                # Column list is now reliably string/object type due to the fix in load_data
                 config_columns = [col for col in df_base.columns if col not in [DATE_COLUMN, VALUE_COLUMN]]
                 category_columns = ['None'] + sorted(config_columns)
                 
@@ -822,6 +830,7 @@ with st.sidebar:
 
             if filter_enabled:
                 
+                # This logic now works reliably because of the string conversion in load_data
                 filter_columns = [c for c in df_base.columns if df_base[c].dtype in ['object', 'category'] and c not in [DATE_COLUMN]]
                 filter_columns = ['None'] + sorted(filter_columns)
                 
