@@ -26,7 +26,7 @@ PREDEFINED_COLORS = {
 }
 # Define the default single bar color (third color in the palette for a lighter tone)
 SINGLE_BAR_COLOR = '#BBBAF6'
-# Define the prediction shade color (UPDATED: Medium Grey, used for the HATCHING edgecolor)
+# Define the prediction shade color (Medium Grey, used for the HATCHING edgecolor)
 PREDICTION_HATCH_COLOR = '#808080' 
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
@@ -248,8 +248,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     bar_color = color
                     
                     # Hatching logic: Apply hatching only to predicted bars
-                    hatch_style = '///' if is_predicted[i] else None
-                    # Set the hatching color to light grey/medium grey
+                    hatch_style = 'xx' if is_predicted[i] else None # Use 'xx' for thicker lines
+                    # Set the hatching color to medium grey
                     edge_color = PREDICTION_HATCH_COLOR if is_predicted[i] else 'none'
                     
                     alpha_val = 1.0 # Keep alpha 1.0
@@ -295,8 +295,8 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 bar_color = SINGLE_BAR_COLOR
                 
                 # Hatching logic: Apply hatching only to predicted bars
-                hatch_style = '///' if is_predicted[i] else None
-                # Set the hatching color to light grey/medium grey
+                hatch_style = 'xx' if is_predicted[i] else None # Use 'xx' for thicker lines
+                # Set the hatching color to medium grey
                 edge_color = PREDICTION_HATCH_COLOR if is_predicted[i] else 'none'
                 
                 alpha_val = 1.0 
@@ -418,17 +418,21 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     color = category_colors[cat]
                 else:
                     color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
-                legend_elements.append(Line2D([0], [0], marker='s', linestyle='',
-                                              markerfacecolor=color, markersize=LEGEND_MARKER_SIZE * 0.7, label=cat))
+                # Use circle marker ('o') and remove edge color
+                legend_elements.append(Line2D([0], [0], marker='o', linestyle='',
+                                              markerfacecolor=color, markersize=LEGEND_MARKER_SIZE * 0.7, 
+                                              markeredgecolor='none', label=cat))
         else:
             # Single bar
-            legend_elements.append(Line2D([0], [0], marker='s', linestyle='',
-                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE * 0.7, label=bar_legend_label))
+            # Use circle marker ('o') and remove edge color
+            legend_elements.append(Line2D([0], [0], marker='o', linestyle='',
+                                          markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE * 0.7, 
+                                          markeredgecolor='none', label=bar_legend_label))
 
 
     # --- LINE LEGEND ENTRY (Single Entry for all "Number of Deals") ---
     if show_line:
-        # Add a single entry for the line count
+        # Add a single entry for the line count (uses default line marker: circle)
         legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals'))
 
 
