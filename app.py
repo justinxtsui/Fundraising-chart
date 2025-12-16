@@ -26,8 +26,8 @@ PREDEFINED_COLORS = {
 }
 # Define the default single bar color (third color in the palette for a lighter tone)
 SINGLE_BAR_COLOR = '#BBBAF6'
-# Define the prediction shade color (Changed to Light Grey for better visual separation and label contrast)
-PREDICTION_SHADE_COLOR = '#F0F0F0' 
+# Define the prediction shade color (Light Grey, used for the HATCHING edgecolor)
+PREDICTION_HATCH_COLOR = '#F0F0F0'
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
@@ -38,7 +38,7 @@ APP_TITLE_COLOR = '#000000'
 DEFAULT_TITLE = 'Grant Funding and Deal Count Over Time'
 
 # Set page config and general styles
-st.set_page_config(page_title="Time Series Chart Generator", layout="wide", initial_sidebar_state="expanded")
+st.set_set_page_config(page_title="Time Series Chart Generator", layout="wide", initial_sidebar_state="expanded")
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'Public Sans', 'DejaVu Sans']
 
@@ -238,23 +238,31 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 val = final_data[cat].iloc[i]
                 
                 if show_bars and val > 0:
-                    # Bar shading logic: Use light grey shade for predicted bars
-                    bar_color = PREDICTION_SHADE_COLOR if is_predicted[i] else color
-                    hatch_style = '///' if is_predicted[i] else None # Hatching for prediction
+                    # Bar color remains the base color (purple/lavender) for both actual and predicted data
+                    bar_color = color
+                    
+                    # Hatching logic: Apply hatching only to predicted bars
+                    hatch_style = '///' if is_predicted[i] else None
+                    # Set the hatching color to light grey
+                    edge_color = PREDICTION_HATCH_COLOR if is_predicted[i] else 'none'
+                    
                     alpha_val = 1.0 # Keep alpha 1.0
                     
                     # Plot the bar
-                    # Only use label in legend for the first category instance (i==0)
-                    # Use label='_nolegend_' to suppress auto-labels for individual bars
                     label_str = cat if i == 0 else '_nolegend_'
                     
                     chart_ax1.bar(x, val, bar_width, bottom=bottom[i],
-                                  label=label_str, color=bar_color, alpha=alpha_val, hatch=hatch_style)
+                                  label=label_str, 
+                                  color=bar_color, 
+                                  alpha=alpha_val, 
+                                  hatch=hatch_style,
+                                  edgecolor=edge_color,
+                                  linewidth=0) # Remove border around bar
                     
                     # Data label logic
                     label_text = format_currency(val)
-                    # Text color logic: Black for light bars (including the new light grey prediction shade), White for dark solid bars
-                    text_color = '#000000' if is_predicted[i] or not is_dark_color(color) else '#FFFFFF'
+                    # Text color logic: White for dark bars, Black for light bars (light grey hatching on purple is OK)
+                    text_color = '#FFFFFF' if is_dark_color(color) else '#000000'
                     
                     # Vertical positioning logic (near the base / center):
                     if idx == 0:
@@ -277,21 +285,30 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 x = x_pos[i]
                 val = final_data[VALUE_COLUMN].iloc[i]
                 
-                # Bar shading logic: predicted uses PREDICTION_SHADE_COLOR
-                bar_color = PREDICTION_SHADE_COLOR if is_predicted[i] else SINGLE_BAR_COLOR
+                # Bar color remains the single bar color for both actual and predicted data
+                bar_color = SINGLE_BAR_COLOR
+                
+                # Hatching logic: Apply hatching only to predicted bars
                 hatch_style = '///' if is_predicted[i] else None
+                # Set the hatching color to light grey
+                edge_color = PREDICTION_HATCH_COLOR if is_predicted[i] else 'none'
+                
                 alpha_val = 1.0 
                 
                 # Only use label in legend for the first category instance (i==0)
-                label_str = 'Total amount received' if i == 0 else '_nolegend_'
+                label_str = bar_legend_label if i == 0 else '_nolegend_'
                 
                 chart_ax1.bar(x, val, bar_width,
                               label=label_str,
-                              color=bar_color, alpha=alpha_val, hatch=hatch_style)
+                              color=bar_color, 
+                              alpha=alpha_val, 
+                              hatch=hatch_style,
+                              edgecolor=edge_color,
+                              linewidth=0) # Remove border around bar
         
                 if val > 0:
                     label_text = format_currency(val)
-                    # Text color logic: Black for the light bar/prediction shade
+                    # Text color logic: Black for the light single bar color
                     text_color = '#000000'
 
                     # Vertical positioning logic (near the base):
@@ -339,8 +356,6 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 connection_y = predicted_y
 
             chart_ax2.plot(connection_x, connection_y, color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='_nolegend_')
-        
-        # Fallback for non-predicted line if prediction mode is off (already handled in #1)
         
         # Calculate max_count after plotting to get accurate current limits
         max_count = line_data.max()
@@ -394,7 +409,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     else:  # 'raised'
         bar_legend_label = 'Amount raised'
     
-    # --- BAR LEGEND ENTRIES (Actual only) ---
+    # --- BAR LEGEND ENTRIES (Actual data only) ---
     if show_bars:
         if category_column != 'None':
             # Add all categories using their defined color (Non-predicted style)
@@ -411,10 +426,9 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                                           markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE * 0.7, label=bar_legend_label))
 
 
-    # --- LINE LEGEND ENTRY (Actual only) ---
+    # --- LINE LEGEND ENTRY (Single Entry for all "Number of Deals") ---
     if show_line:
-        # Only add the single "Number of deals" entry (solid line marker)
-        # The logic above ensures the label is only set for the solid line when in default mode.
+        # Add a single entry for the line count
         legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals'))
 
 
