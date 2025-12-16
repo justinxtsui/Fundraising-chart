@@ -38,7 +38,6 @@ APP_TITLE_COLOR = '#000000'
 DEFAULT_TITLE = 'Grant Funding and Deal Count Over Time'
 
 # Set page config and general styles
-# *** CORRECTION APPLIED HERE ***
 st.set_page_config(page_title="Time Series Chart Generator", layout="wide", initial_sidebar_state="expanded")
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'Public Sans', 'DejaVu Sans']
@@ -189,6 +188,13 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     
     # Determine which bars/points are for predicted data
     is_predicted = (years >= prediction_start_year) if prediction_start_year is not None else np.full(len(years), False)
+
+    # --- FIX: Define bar_legend_label early to prevent UnboundLocalError ---
+    if original_value_column == 'received':
+        bar_legend_label = 'Total amount received'
+    else:
+        bar_legend_label = 'Amount raised'
+    # ----------------------------------------------------------------------
     
     # --- DYNAMIC FONT SIZE CALCULATION ---
     
@@ -262,7 +268,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     
                     # Data label logic
                     label_text = format_currency(val)
-                    # Text color logic: Black for light bars (including the new light grey hatching on purple is OK), White for dark solid bars
+                    # Text color logic: Black for light bars, White for dark solid bars
                     text_color = '#FFFFFF' if is_dark_color(color) else '#000000'
                     
                     # Vertical positioning logic (near the base / center):
@@ -297,6 +303,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 alpha_val = 1.0 
                 
                 # Only use label in legend for the first category instance (i==0)
+                # bar_legend_label is now guaranteed to be defined
                 label_str = bar_legend_label if i == 0 else '_nolegend_'
                 
                 chart_ax1.bar(x, val, bar_width,
@@ -403,12 +410,6 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     # Define large font size for legend
     LEGEND_FONT_SIZE = 18  # Legend font size
     LEGEND_MARKER_SIZE = 16
-    
-    # Set legend label based on original column type
-    if original_value_column == 'received':
-        bar_legend_label = 'Total amount received'
-    else:  # 'raised'
-        bar_legend_label = 'Amount raised'
     
     # --- BAR LEGEND ENTRIES (Actual data only) ---
     if show_bars:
