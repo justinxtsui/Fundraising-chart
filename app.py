@@ -515,6 +515,7 @@ with st.sidebar:
     # Initialize df_base to None
     df_base = None
     
+    # --- Load Data and Set Default Years ---
     if uploaded_file:
         df_base, error_msg, original_value_column = load_data(uploaded_file)
         if df_base is None:
@@ -525,14 +526,15 @@ with st.sidebar:
         # Store original_value_column in session state
         st.session_state['original_value_column'] = original_value_column
         
-    if df_base is not None:
-        
-        # --- 3. TIME FILTERS: Data Initialization moved here ---
-        # FIX for min_year access error: Ensure these are inside the df_base check
+        # Calculate min/max years based on loaded data
         min_year = int(df_base[DATE_COLUMN].dt.year.min())
         max_year = int(df_base[DATE_COLUMN].dt.year.max())
         all_years = list(range(min_year, max_year + 1))
-        # ----------------------------------------------------
+        
+        default_start = min_year
+        default_end = max_year
+        
+        # --- Continue with the rest of the configuration blocks only if data is loaded ---
         
         # --- 2. CHART TITLE ---
         st.markdown("---")
@@ -549,9 +551,6 @@ with st.sidebar:
         # --- 3. TIME FILTERS ---
         st.markdown("---")
         st.header("3. Time Filters")
-        
-        default_start = min_year
-        default_end = max_year
         
         current_start, current_end = st.session_state.get('year_range', (default_start, default_end))
         
