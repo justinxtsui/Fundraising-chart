@@ -26,8 +26,8 @@ PREDEFINED_COLORS = {
 }
 # Define the default single bar color (third color in the palette for a lighter tone)
 SINGLE_BAR_COLOR = '#BBBAF6'
-# Define the prediction shade color (Light Lavender/Purple for better text visibility)
-PREDICTION_SHADE_COLOR = '#D0CCE5' # Use Light Lavender from the palette
+# Define the prediction shade color (Changed to Light Grey for better visual separation and label contrast)
+PREDICTION_SHADE_COLOR = '#F0F0F0' 
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
 # Define the chart title color
@@ -238,20 +238,23 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 val = final_data[cat].iloc[i]
                 
                 if show_bars and val > 0:
-                    # Bar shading logic: Use solid color for non-predicted, predicted uses PREDICTION_SHADE_COLOR
+                    # Bar shading logic: Use light grey shade for predicted bars
                     bar_color = PREDICTION_SHADE_COLOR if is_predicted[i] else color
                     hatch_style = '///' if is_predicted[i] else None # Hatching for prediction
-                    alpha_val = 1.0 # Keep alpha 1.0 for better visibility
+                    alpha_val = 1.0 # Keep alpha 1.0
                     
                     # Plot the bar
                     # Only use label in legend for the first category instance (i==0)
+                    # Use label='_nolegend_' to suppress auto-labels for individual bars
+                    label_str = cat if i == 0 else '_nolegend_'
+                    
                     chart_ax1.bar(x, val, bar_width, bottom=bottom[i],
-                                  label=cat if i == 0 else None, color=bar_color, alpha=alpha_val, hatch=hatch_style)
+                                  label=label_str, color=bar_color, alpha=alpha_val, hatch=hatch_style)
                     
                     # Data label logic
                     label_text = format_currency(val)
-                    # Text color logic: White for dark bars, Black for light bars (including the new light prediction shade)
-                    text_color = '#FFFFFF' if is_dark_color(color) and not is_predicted[i] else '#000000'
+                    # Text color logic: Black for light bars (including the new light grey prediction shade), White for dark solid bars
+                    text_color = '#000000' if is_predicted[i] or not is_dark_color(color) else '#FFFFFF'
                     
                     # Vertical positioning logic (near the base / center):
                     if idx == 0:
@@ -280,8 +283,10 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 alpha_val = 1.0 
                 
                 # Only use label in legend for the first category instance (i==0)
+                label_str = 'Total amount received' if i == 0 else '_nolegend_'
+                
                 chart_ax1.bar(x, val, bar_width,
-                              label='Total amount received' if i == 0 else None,
+                              label=label_str,
                               color=bar_color, alpha=alpha_val, hatch=hatch_style)
         
                 if val > 0:
@@ -320,9 +325,11 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         
         # 1. Plot Actual (Solid Line)
         if len(actual_x) > 0:
-            chart_ax2.plot(actual_x, actual_y, color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label=None)
+            # Only add label if not in prediction mode or if this is the only line shown
+            label_str = 'Number of deals' if prediction_start_year is None else '_nolegend_'
+            chart_ax2.plot(actual_x, actual_y, color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label=label_str)
 
-        # 2. Plot Predicted (Dotted Line)
+        # 2. Plot Predicted (Dotted Line) - Use '_nolegend_' for the prediction line
         if len(predicted_x) > 0:
             if len(actual_x) > 0 and predicted_x[0] == actual_x[-1] + 1:
                 connection_x = np.concatenate(([actual_x[-1]], predicted_x))
@@ -331,11 +338,9 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 connection_x = predicted_x
                 connection_y = predicted_y
 
-            chart_ax2.plot(connection_x, connection_y, color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label=None)
+            chart_ax2.plot(connection_x, connection_y, color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='_nolegend_')
         
-        # Fallback for non-predicted line if prediction mode is off
-        if prediction_start_year is None and len(final_data) > 0:
-            chart_ax2.plot(x_pos, line_data, color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals')
+        # Fallback for non-predicted line if prediction mode is off (already handled in #1)
         
         # Calculate max_count after plotting to get accurate current limits
         max_count = line_data.max()
@@ -389,10 +394,10 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     else:  # 'raised'
         bar_legend_label = 'Amount raised'
     
-    # --- BAR LEGEND ENTRIES ---
+    # --- BAR LEGEND ENTRIES (Actual only) ---
     if show_bars:
         if category_column != 'None':
-            # Add actual categories (non-predicted style)
+            # Add all categories using their defined color (Non-predicted style)
             for idx, cat in enumerate(category_cols):
                 if category_colors and cat in category_colors:
                     color = category_colors[cat]
@@ -400,35 +405,20 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
                 legend_elements.append(Line2D([0], [0], marker='s', linestyle='',
                                               markerfacecolor=color, markersize=LEGEND_MARKER_SIZE * 0.7, label=cat))
-            
-            # Add single proxy for Predicted Bars (Hatched Light Purple)
-            if prediction_start_year is not None and prediction_start_year <= years.max():
-                 proxy = Patch(facecolor=PREDICTION_SHADE_COLOR, edgecolor='k', hatch='///', alpha=1.0, label=f'{bar_legend_label} (Predicted)')
-                 legend_elements.append(proxy)
         else:
-            # Single bar: Use one entry, and add predicted if needed
+            # Single bar
             legend_elements.append(Line2D([0], [0], marker='s', linestyle='',
                                           markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE * 0.7, label=bar_legend_label))
-            if prediction_start_year is not None and prediction_start_year <= years.max():
-                 proxy = Patch(facecolor=PREDICTION_SHADE_COLOR, edgecolor='k', hatch='///', alpha=1.0, label=f'{bar_legend_label} (Predicted)')
-                 legend_elements.append(proxy)
 
 
-    # --- LINE LEGEND ENTRY ---
+    # --- LINE LEGEND ENTRY (Actual only) ---
     if show_line:
-        # Check if we are in prediction mode
-        is_in_prediction_mode = prediction_start_year is not None and prediction_start_year <= years.max()
-        
-        if is_in_prediction_mode:
-            # If in prediction mode, add two distinct line entries
-            legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals (Actual)'))
-            legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='Number of deals (Predicted)'))
-        else:
-            # If not in prediction mode (or prediction mode is off), add one single solid line entry
-            legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals'))
+        # Only add the single "Number of deals" entry (solid line marker)
+        # The logic above ensures the label is only set for the solid line when in default mode.
+        legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals'))
 
 
-    # Remove duplicates in the legend (should only affect the default non-prediction line entry if both modes are active but this logic is generally good practice)
+    # Filter to unique labels (important for cases where prediction is OFF)
     final_legend_elements = []
     seen_labels = set()
     for element in legend_elements:
