@@ -136,9 +136,14 @@ def load_data(uploaded_file):
         # ---------------------------------------------------------------------------------------------------------
         
         data.dropna(subset=[DATE_COLUMN], inplace=True)
+        
         # Convert value column to numeric, setting errors='coerce' to turn bad values to NaN
         data[VALUE_COLUMN] = pd.to_numeric(data[VALUE_COLUMN], errors='coerce')
-        data.dropna(subset=[VALUE_COLUMN], inplace=True)
+        
+        # --- FIX 3: FILL MISSING VALUES WITH 0 INSTEAD OF DROPPING THE ROW ---
+        # This ensures deals with "Undisclosed" amounts are still counted in the line chart.
+        data[VALUE_COLUMN] = data[VALUE_COLUMN].fillna(0)
+        # ---------------------------------------------------------------------
 
     except Exception as e:
         return None, f"An error occurred during data conversion: {e}", None
