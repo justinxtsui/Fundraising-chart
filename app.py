@@ -5,6 +5,7 @@ import numpy as np
 from io import BytesIO
 from matplotlib.lines import Line2D
 from matplotlib.colors import to_rgb
+from matplotlib.patches import Patch
 from streamlit_sortables import sort_items
 
 # --- CONFIGURATION ---
@@ -15,7 +16,8 @@ VALUE_COLUMN = 'Amount raised (converted to GBP)'
 ALT_DATE_COLUMN = 'Date the participant received the grant'
 ALT_VALUE_COLUMN = 'Amount received (converted to GBP)'
 # Define the color palette for categories
-CATEGORY_COLORS = ['#302A7E', '#D0CCE5']  # Dark Purple and Light Lavender only
+# FIX: The non-printable character (U+00A0) has been replaced with a standard space.
+CATEGORY_COLORS = ['#302A7E', '#D0CCE5'] # Dark Purple and Light Lavender only
 
 # Predefined color palette for user selection (3 purple/lavender shades)
 PREDEFINED_COLORS = {
@@ -27,8 +29,6 @@ PREDEFINED_COLORS = {
 SINGLE_BAR_COLOR = '#BBBAF6'
 # Define the line chart color
 LINE_COLOR = '#000000' # Black for high contrast
-# Define the prediction shading color
-PREDICTION_SHADE_COLOR = '#F0F0F0' # Light Grey
 # Define the chart title color
 TITLE_COLOR = '#000000' # Matplotlib Chart Title Color is Black
 # Define the Application Title Color (Black)
@@ -177,7 +177,7 @@ def process_data(df, year_range, category_column):
 
 
 def generate_chart(final_data, category_column, show_bars, show_line, chart_title, original_value_column='raised', category_colors=None, category_order=None, prediction_start_year=None):
-    """Generates the dual-axis Matplotlib chart."""
+    """Generates the dual-axis Matplotlib chart with prediction styling."""
     # Matplotlib Figure Size (Increased for resolution)
     chart_fig, chart_ax1 = plt.subplots(figsize=(20, 10)) 
     
@@ -204,18 +204,14 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
         DYNAMIC_FONT_SIZE = 12
     # -------------------------------------------------------------
     
-    
     category_cols = []
     if category_column != 'None':
         category_cols = [col for col in final_data.columns if col not in ['time_period', 'row_count']]
         
         # Sort categories by user-defined order if provided
         if category_order:
-            # Create a list of (category, order) tuples
             category_order_list = [(cat, category_order.get(cat, 999)) for cat in category_cols]
-            # Sort by order value
             category_order_list.sort(key=lambda x: x[1])
-            # Extract sorted category names
             category_cols = [cat for cat, _ in category_order_list]
 
     if category_column == 'None':
@@ -247,6 +243,7 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     alpha_val = 0.5 if is_predicted[i] else 1.0    # Optional: Reduce opacity
                     
                     # Plot the bar
+                    # Only use label in legend for the first category instance (i==0)
                     chart_ax1.bar(x, val, bar_width, bottom=bottom[i], 
                                   label=cat if i == 0 else None, color=bar_color, alpha=alpha_val, hatch=hatch_style)
                     
@@ -275,10 +272,11 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                 val = final_data[VALUE_COLUMN].iloc[i]
                 bar_color = SINGLE_BAR_COLOR
                 hatch_style = '///' if is_predicted[i] else None
-                alpha_val = 0.5 if is_predicted[i] else 1.0
+                alpha_val = 1.0 # Keep alpha 1.0 for non-stacked bars (hatch visibility is better)
                 
+                # Only use label in legend for the first category instance (i==0)
                 chart_ax1.bar(x, val, bar_width, 
-                              label='Total amount received' if i == 0 else None, # Only label once
+                              label='Total amount received' if i == 0 else None,
                               color=bar_color, alpha=alpha_val, hatch=hatch_style) 
         
                 if val > 0:
@@ -302,42 +300,40 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
     for spine in chart_ax1.spines.values():
         spine.set_visible(False)
     chart_ax1.grid(False)
-    
+
     # --- AXIS 2 (Line Chart - Count) ---
     if show_line:
         chart_ax2 = chart_ax1.twinx()
         line_data = final_data['row_count'].values
         
-        # Plot non-predicted line (solid)
-        solid_indices = np.where(~is_predicted)[0]
-        for i in range(len(solid_indices) - 1):
-            start_i = solid_indices[i]
-            end_i = solid_indices[i+1]
-            chart_ax2.plot(x_pos[start_i:end_i+1], line_data[start_i:end_i+1], 
-                            color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label=None)
+        # Split data into actual and predicted sections for separate plotting styles
+        actual_x = x_pos[~is_predicted]
+        actual_y = line_data[~is_predicted]
+        predicted_x = x_pos[is_predicted]
+        predicted_y = line_data[is_predicted]
         
-        # Plot predicted line (dotted/dashed)
-        predicted_indices = np.where(is_predicted)[0]
-        # Find the last non-predicted index to connect the line
-        if len(solid_indices) > 0 and len(predicted_indices) > 0:
-            last_solid_idx = solid_indices[-1]
-            first_predicted_idx = predicted_indices[0]
-            # Plot segment connecting last solid to first predicted
-            if last_solid_idx == first_predicted_idx - 1:
-                chart_ax2.plot(x_pos[last_solid_idx:first_predicted_idx+1], line_data[last_solid_idx:first_predicted_idx+1], 
-                                color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label=None)
+        # 1. Plot Actual (Solid Line)
+        if len(actual_x) > 0:
+            # Draw solid line between actual points
+            chart_ax2.plot(actual_x, actual_y, color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals (Actual)')
 
-        # Plot predicted segments
-        if len(predicted_indices) > 0:
-            # Start from the first predicted year and plot consecutive dotted segments
-            start_plot_idx = predicted_indices[0]
-            chart_ax2.plot(x_pos[start_plot_idx:], line_data[start_plot_idx:],
-                            color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='Number of deals (Predicted)')
+        # 2. Plot Predicted (Dotted Line)
+        if len(predicted_x) > 0:
+            # Find the connection point (last actual data point)
+            if len(actual_x) > 0 and predicted_x[0] == actual_x[-1] + 1:
+                # Include the last actual point to ensure connection
+                connection_x = np.concatenate(([actual_x[-1]], predicted_x))
+                connection_y = np.concatenate(([actual_y[-1]], predicted_y))
+            else:
+                connection_x = predicted_x
+                connection_y = predicted_y
+
+            chart_ax2.plot(connection_x, connection_y, color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='Number of deals (Predicted)')
         
-        # If no prediction, plot one solid line for the whole range
-        if prediction_start_year is None or prediction_start_year > years.max():
+        # Fallback for non-predicted line if prediction mode is off
+        if prediction_start_year is None and len(final_data) > 0:
             chart_ax2.plot(x_pos, line_data, color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals')
-
+        
         # Calculate max_count after plotting to get accurate current limits
         max_count = line_data.max()
         chart_ax2.set_ylim(0, max_count * 1.5)
@@ -397,32 +393,35 @@ def generate_chart(final_data, category_column, show_bars, show_line, chart_titl
                     color = category_colors[cat]
                 else:
                     color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
+                # Use square marker for bar categories
                 legend_elements.append(Line2D([0], [0], marker='s', linestyle='', 
-                                              markerfacecolor=color, markersize=LEGEND_MARKER_SIZE * 0.7, label=cat))  # Changed to square marker
+                                              markerfacecolor=color, markersize=LEGEND_MARKER_SIZE * 0.7, label=cat))
         else:
+            # Single bar category
             legend_elements.append(Line2D([0], [0], marker='s', linestyle='', 
                                           markerfacecolor=SINGLE_BAR_COLOR, markersize=LEGEND_MARKER_SIZE * 0.7, label=bar_legend_label)) 
             
+    # Add a special entry for predicted bars if applicable
+    if show_bars and prediction_start_year is not None and prediction_start_year <= years.max():
+        # Create a proxy element for the hatched bar using the first category color or single bar color
+        default_color = CATEGORY_COLORS[0] if category_column != 'None' else SINGLE_BAR_COLOR
+        proxy = Patch(facecolor=default_color, edgecolor='k', hatch='///', alpha=0.5, label=f'{bar_legend_label} (Predicted)')
+        legend_elements.append(proxy)
+    
     if show_line:
         # Add two entries for the line to show solid/dotted distinction
         legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='-', linewidth=1.5, markersize=6, label='Number of deals (Actual)'))
         if prediction_start_year is not None and prediction_start_year <= years.max():
             legend_elements.append(Line2D([0], [0], color=LINE_COLOR, marker='o', linestyle='--', linewidth=1.5, markersize=6, label='Number of deals (Predicted)'))
 
-    # Add a special entry for predicted bars if applicable
-    if show_bars and prediction_start_year is not None and prediction_start_year <= years.max():
-        # Create a proxy element for the hatched bar
-        from matplotlib.patches import Patch
-        proxy = Patch(facecolor=CATEGORY_COLORS[0], edgecolor='k', hatch='///', alpha=0.5, label=f'{bar_legend_label} (Predicted)')
-        legend_elements.append(proxy)
-    
-    # Remove duplicates for items without prediction logic (only keeping the first instance)
+    # Remove duplicates in the legend (e.g. if default line and actual line are the same)
     final_legend_elements = []
     seen_labels = set()
     for element in legend_elements:
-        if element.get_label() not in seen_labels and element.get_label() != '_nolegend_':
+        label = element.get_label()
+        if label not in seen_labels and label != '_nolegend_':
             final_legend_elements.append(element)
-            seen_labels.add(element.get_label())
+            seen_labels.add(label)
 
     # Legend with increased font size and proportional markers
     chart_ax1.legend(handles=final_legend_elements, loc='upper left', 
@@ -588,14 +587,20 @@ with st.sidebar:
         
         prediction_start_year = None
         
-        if enable_prediction and all_years:
-            # Add 'None' option to year selection
-            prediction_options = ['None'] + all_years
+        # Check if the currently filtered time range has any years
+        filtered_years = list(range(start_year, end_year + 1))
+        
+        if enable_prediction and filtered_years:
+            # Only allow selection of years that are visible in the chart
+            prediction_options = ['None'] + filtered_years
             
             # Find the index of the current or last year
-            default_index = len(all_years) if st.session_state['prediction_start_year'] is None else (
-                prediction_options.index(st.session_state['prediction_start_year']) if st.session_state['prediction_start_year'] in prediction_options else len(all_years)
-            )
+            default_year_to_select = st.session_state['prediction_start_year']
+            if default_year_to_select not in prediction_options:
+                # If the previous selection is outside the new range, default to the last year of the range
+                default_year_to_select = filtered_years[-1] if filtered_years else 'None'
+            
+            default_index = prediction_options.index(default_year_to_select) if default_year_to_select != 'None' else 0
             
             selected_prediction_year = st.selectbox(
                 "Start Year for Prediction/Shading",
@@ -607,7 +612,11 @@ with st.sidebar:
             
             if selected_prediction_year != 'None':
                 prediction_start_year = int(selected_prediction_year)
-
+                # Ensure the prediction year is within the selected filter range
+                if prediction_start_year < start_year or prediction_start_year > end_year:
+                    st.warning(f"Prediction start year {prediction_start_year} is outside the time filter range ({start_year}-{end_year}). Prediction styling will not be shown.")
+                    prediction_start_year = None
+            
         st.session_state['prediction_start_year'] = prediction_start_year
         
         # --- 5. STACKED BAR (OPTIONAL) ---
@@ -624,278 +633,4 @@ with st.sidebar:
             category_column = st.selectbox(
                 "Select Column for Stacking", 
                 category_columns,
-                index=category_columns.index(st.session_state.get('category_column', 'None')),
-                key='category_col_selector',
-                help="Select a column to stack and color-code the bars."
-            )
-            st.session_state['category_column'] = category_column
-            
-            # Color picker for each category  
-            if category_column != 'None':
-                st.subheader("Category Order & Colors")
-                
-                # Enhanced CSS for modern, clean design
-                st.markdown("""
-                    <style>
-                    /* Modern sortable styling */
-                    .sortable-item {
-                        background: white !important;
-                        border: 2px dashed #d0d0d0 !important;
-                        border-radius: 8px !important;
-                        padding: 14px 16px !important;
-                        margin: 10px 0 !important;
-                        cursor: grab !important;
-                        transition: all 0.2s ease !important;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
-                    }
-                    .sortable-item:hover {
-                        background: #fafafa !important;
-                        border-color: #8884B3 !important;
-                        border-style: solid !important;
-                        box-shadow: 0 2px 8px rgba(136,132,179,0.15) !important;
-                        transform: translateY(-1px) !important;
-                    }
-                    .sortable-item:active {
-                        cursor: grabbing !important;
-                    }
-                    .sortable-ghost {
-                        opacity: 0.4 !important;
-                        background: #f0f0f0 !important;
-                    }
-                    </style>
-                """, unsafe_allow_html=True)
-                
-                # Get unique categories from the selected column
-                unique_categories = sorted(df_base[category_column].dropna().unique())
-                
-                # Initialize category_colors and category_order in session state if not exists
-                if 'category_colors' not in st.session_state:
-                    st.session_state['category_colors'] = {}
-                if 'category_order' not in st.session_state:
-                    st.session_state['category_order'] = {}
-                
-                # Initialize sorted category list if not exists or if categories changed
-                if 'sorted_categories' not in st.session_state or set(st.session_state.get('sorted_categories', [])) != set(unique_categories):
-                    st.session_state['sorted_categories'] = list(reversed(unique_categories))  # Reversed so top = top
-                
-                # Pre-assign colors before showing drag interface
-                for idx, category in enumerate(st.session_state['sorted_categories']):
-                    if category not in st.session_state['category_colors']:
-                        default_color = CATEGORY_COLORS[idx % len(CATEGORY_COLORS)]
-                        st.session_state['category_colors'][category] = default_color
-                
-                # Drag section
-                st.markdown("**Drag to Reorder**")
-                
-                # Simple drag interface
-                sorted_categories = sort_items(
-                    st.session_state['sorted_categories'],
-                    direction='vertical',
-                    key='category_sorter'
-                )
-                
-                # Update sorted categories in session state
-                st.session_state['sorted_categories'] = sorted_categories
-                
-                # Update category order based on sorted list (higher number = higher in stack)
-                num_categories = len(sorted_categories)
-                for idx, category in enumerate(sorted_categories):
-                    st.session_state['category_order'][category] = num_categories - idx
-                
-                st.markdown("---")
-                
-                # Color selection section
-                st.markdown("**Assign Colors**")
-                
-                for idx, category in enumerate(sorted_categories):
-                    current_color = st.session_state['category_colors'].get(category, CATEGORY_COLORS[idx % len(CATEGORY_COLORS)])
-                    
-                    # Create row with category, dropdown, and color box
-                    col1, col2, col3 = st.columns([1, 1.5, 0.5])
-                    
-                    with col1:
-                        # Category name
-                        st.markdown(f"<div style='padding-top: 8px; font-size: 16px;'><strong>{category}</strong></div>", unsafe_allow_html=True)
-                    
-                    with col2:
-                        # Dropdown with just hex codes (no emojis)
-                        color_options = list(PREDEFINED_COLORS.values())
-                        
-                        selected_hex = st.selectbox(
-                            f"Color for {category}",
-                            options=color_options,
-                            index=color_options.index(current_color) if current_color in color_options else 0,
-                            key=f'color_select_{category}',
-                            label_visibility='collapsed'
-                        )
-                        
-                        st.session_state['category_colors'][category] = selected_hex
-                    
-                    with col3:
-                        # Colored square box showing selected color
-                        st.markdown(
-                            f'<div style="background-color: {selected_hex}; height: 38px; width: 100%; '
-                            f'border-radius: 4px; border: 2px solid #ddd; margin-top: 0px;"></div>',
-                            unsafe_allow_html=True
-                        )
-        else:
-            st.session_state['category_column'] = 'None'
-            st.session_state['category_colors'] = {}
-            st.session_state['category_order'] = {}
-            if 'sorted_categories' in st.session_state:
-                del st.session_state['sorted_categories']
-
-        # --- 6. DATA FILTER ---
-        st.markdown("---")
-        st.header("6. Data Filter")
-
-        filter_enabled = st.checkbox('Enable Data Filtering', value=st.session_state['filter_enabled'])
-        st.session_state['filter_enabled'] = filter_enabled
-
-        if filter_enabled:
-            
-            filter_columns = [c for c in df_base.columns if df_base[c].dtype in ['object', 'category'] and c not in [DATE_COLUMN]]
-            filter_columns = ['None'] + sorted(filter_columns)
-            
-            filter_column = st.selectbox(
-                "Select Column to Filter",
-                filter_columns,
-                index=filter_columns.index(st.session_state['filter_column']) if st.session_state['filter_column'] in filter_columns else 0,
-                key='filter_col_selector'
-            )
-            st.session_state['filter_column'] = filter_column
-
-            if filter_column != 'None':
-                
-                # Fetch unique values for the selected column
-                unique_values = df_base[filter_column].astype(str).unique().tolist()
-                
-                filter_mode = st.radio(
-                    "Filter Mode",
-                    options=["Include selected values", "Exclude selected values"],
-                    index=0 if st.session_state['filter_include'] else 1,
-                    key='filter_mode_radio'
-                )
-                
-                st.session_state['filter_include'] = (filter_mode == "Include selected values")
-                
-                # Use default from session state or all unique values if first run
-                default_selection = st.session_state['filter_values'] if st.session_state['filter_values'] else unique_values
-                
-                selected_values = st.multiselect(
-                    f"Select values in '{filter_column}'",
-                    options=unique_values,
-                    default=[v for v in default_selection if v in unique_values], # Ensure defaults are valid options
-                    key='filter_values_selector'
-                )
-                st.session_state['filter_values'] = selected_values
-            else:
-                 st.session_state['filter_values'] = []
-
-        # --- 7. DOWNLOAD SECTION ---
-        st.markdown("---")
-        st.header("7. Download Chart")
-        
-        with st.expander("Download Options", expanded=True):
-            st.caption("Download your generated chart file.")
-            st.download_button(
-                label="Download as **PNG** (High-Res)",
-                data=st.session_state.get('buf_png', BytesIO()),
-                file_name=f"{custom_title.replace(' ', '_').lower()}_chart.png",
-                mime="image/png",
-                key="download_png",
-                use_container_width=True
-            )
-            st.download_button(
-                label="Download as **SVG** (Vector)",
-                data=st.session_state.get('buf_svg', BytesIO()),
-                file_name=f"{custom_title.replace(' ', '_').lower()}_chart.svg",
-                mime="image/svg+xml",
-                key="download_svg",
-                use_container_width=True
-            )
-
-
-# --- MAIN AREA: CHART DISPLAY ONLY ---
-
-if 'df_base' in locals() and df_base is not None:
-    
-    # Apply dynamic filter first
-    filter_config = {
-        'enabled': st.session_state['filter_enabled'],
-        'column': st.session_state['filter_column'],
-        'include': st.session_state['filter_include'],
-        'values': st.session_state['filter_values']
-    }
-    
-    df_filtered = apply_filter(df_base, filter_config)
-    
-    if df_filtered.empty:
-        st.error("The selected filters resulted in no data. Please adjust your configuration.")
-        st.stop()
-        
-    # Process the data
-    final_data, process_error = process_data(df_filtered, st.session_state['year_range'], st.session_state['category_column'])
-    
-    if final_data is None:
-        st.error(process_error)
-        st.stop()
-    
-    # Get prediction year from session state
-    prediction_start_year = st.session_state['prediction_start_year']
-    
-    # Generate the chart, passing the new parameter
-    chart_fig = generate_chart(final_data, st.session_state['category_column'], 
-                               st.session_state['show_bars'], st.session_state['show_line'], 
-                               st.session_state['chart_title'], 
-                               st.session_state.get('original_value_column', 'raised'),
-                               st.session_state.get('category_colors', {}),
-                               st.session_state.get('category_order', {}),
-                               prediction_start_year=prediction_start_year)
-
-    # --- CHART CENTERING IMPROVEMENT ---
-    # Centering and sizing adjustment: Minimized side margins ([0.05, 7, 0.05])
-    col_left, col_chart, col_right = st.columns([0.05, 7, 0.05])
-    
-    with col_chart:
-        # Display the chart. use_container_width=True to fill the allocated column space.
-        st.pyplot(chart_fig, use_container_width=True) 
-    
-    # --- Export Figure to Buffers (for download buttons) ---
-    
-    # PNG
-    buf_png = BytesIO()
-    chart_fig.savefig(buf_png, format='png', dpi=300, bbox_inches='tight')
-    buf_png.seek(0)
-    st.session_state['buf_png'] = buf_png
-
-    # SVG
-    buf_svg = BytesIO()
-    chart_fig.savefig(buf_svg, format='svg', bbox_inches='tight')
-    buf_svg.seek(0)
-    st.session_state['buf_svg'] = buf_svg
-
-else:
-    # Message for initial load
-    st.info("⬆️ **Please upload your data file using the controls in the sidebar (Section 1) to begin chart configuration.**")
-    st.markdown("---")
-    
-    st.subheader("Expected Data Format")
-    st.markdown(f"""
-    Your file must contain, at minimum, a date column (either **`{DATE_COLUMN}`** or **`{ALT_DATE_COLUMN}`**) and a value column (either **`{VALUE_COLUMN}`** or **`{ALT_VALUE_COLUMN}`**).
-    """)
-    
-    st.markdown("---")
-    st.subheader("How It Works")
-    st.markdown("""
-    This generator creates professional time series charts visualizing value (bars) and count (line) over time.
-
-    1.  **Upload:** Provide your data file in the sidebar.
-    2.  **Configure:** Use the controls in the sidebar sections to:
-        - Set your chart title (Section 2)
-        - Filter the time range (Section 3)
-        - Choose visual elements, including **prediction visuals** (Section 4)
-        - Enable stacked bars (Section 5)
-        - Apply data filters (Section 6)
-    3.  **View & Download:** The generated chart will appear instantly here, ready for high-resolution download in Section 7 of the sidebar.
-    """)
+                index=category_columns.index(st.session_state.get('category
